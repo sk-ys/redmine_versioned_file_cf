@@ -1,0 +1,76 @@
+# frozen_string_literal: true
+
+require_relative '../test_helper'
+
+class VersionedFilesControllerTest < Redmine::ControllerTest
+  def setup
+    User.current = nil
+    set_tmp_attachments_directory
+
+    @issue = Issue.find(1)
+    @custom_field = create_issue_versioned_file_custom_field
+    @custom_value = create_custom_value(issue: @issue, custom_field: @custom_field)
+    @previous_revision = create_revision(
+      custom_value: @custom_value,
+      fixture: 'testfile.txt',
+      content: "alpha\n",
+      revision_number: 1,
+      active: false
+    )
+    @revision = create_revision(
+      custom_value: @custom_value,
+      fixture: 'testfile.txt',
+      content: "beta\n",
+      revision_number: 2,
+      active: true
+    )
+  end
+
+  def teardown
+    set_fixtures_attachments_directory
+  end
+
+  def test_history
+    @request.session[:user_id] = 1
+
+    get(:history, params: { custom_value_id: @custom_value.id })
+
+    assert_response :success
+    assert_select 'td.id', text: 'r2'
+    assert_select 'td.filename', text: /testfile\.txt/
+  end
+
+  def test_diff
+    @request.session[:user_id] = 1
+
+    get(:diff, params: { id: @revision.id })
+
+    assert_response :success
+    assert_select 'table.filecontent.diffcontent'
+    assert_match 'beta', @response.body
+  end
+
+  def test_diff_denies_access_for_invisible_issue
+    private_field = create_issue_versioned_file_custom_field(name: 'Private revision file')
+    private_custom_value = create_custom_value(issue: Issue.find(6), custom_field: private_field)
+    private_previous_revision = create_revision(
+      custom_value: private_custom_value,
+      fixture: 'testfile.txt',
+      content: "private alpha\n",
+      revision_number: 1,
+      active: false
+    )
+    private_revision = create_revision(
+      custom_value: private_custom_value,
+      fixture: 'testfile.txt',
+      content: "private beta\n",
+      revision_number: 2,
+      active: true
+    )
+    @request.session[:user_id] = 7
+
+    get(:diff, params: { id: private_revision.id, compare_to_id: private_previous_revision.id })
+
+    assert_response :forbidden
+  end
+end

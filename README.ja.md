@@ -1,0 +1,83 @@
+# Redmine Versioned File CF Plugin
+
+このプラグインは `ファイル（リビジョン管理）` という新しいカスタムフィールド形式を追加し、アップロードされたテキストファイルの履歴管理を可能にします。
+
+英語版: [README.md](README.md)
+
+## 機能
+
+- `ファイル（リビジョン管理）` をカスタムフィールド形式として追加
+- 既存のファイルカスタムフィールドと同様にファイルのアップロードに対応
+- 登録されたファイルの履歴表示
+- 登録されたファイルの差分表示
+
+### 注意
+
+- アップロード対象はテキストファイルを前提としています
+- 差分ファイルのダウンロードにはサーバー上に Git が必要です
+
+## インストール
+
+### 1. ダウンロード
+#### Git を使用する場合
+```shell
+cd your_redmine/plugins
+git clone https://github.com/sk-ys/redmine_versioned_file_cf.git
+```
+#### Git を使用しない場合
+1. 以下のリンクからダウンロードしてください
+   - リリース版: https://github.com/sk-ys/redmine_versioned_file_cf/releases
+   - 最新版: https://github.com/sk-ys/redmine_versioned_file_cf/archive/refs/heads/main.zip
+2. plugins フォルダに `redmine_versioned_file_cf` というフォルダ名で展開してください
+
+### 2. マイグレーション
+Redmine のルートディレクトリで以下を実行してください。
+
+```shell
+bundle exec rake redmine:plugins:migrate NAME=redmine_versioned_file_cf RAILS_ENV=production
+```
+
+### 3. Redmine を再起動
+Redmine を再起動してください。
+
+## 使い方
+
+1. 管理画面で custom field を新規作成します（Issue・Project・Version など任意のオブジェクトを選択）。
+2. フォーマットに `ファイル（リビジョン管理）` を選びます。
+3. 必要なら許可拡張子を設定します。
+4. 各オブジェクトの編集画面からテキストファイルをアップロードします。
+5. 詳細画面の下部に履歴一覧と差分リンクが表示されます。
+
+## テスト
+
+Redmine のルートディレクトリで test DB を準備します。
+
+```shell
+bundle exec rails db:test:prepare RAILS_ENV=test
+bundle exec rake redmine:plugins:migrate NAME=redmine_versioned_file_cf RAILS_ENV=test
+```
+
+続いてプラグインのテストを実行します。
+
+```shell
+bundle exec rails test plugins/redmine_versioned_file_cf/test RAILS_ENV=test
+```
+
+補足:
+
+- もし minitest / SimpleCov 読み込み不具合が発生する場合は、`MT_NO_PLUGINS=1` をコマンドの先頭に付与してください。
+
+## メンテナンス
+
+必要に応じて、コンテナレコードが既に削除された孤立した添付ファイルを以下のコマンドで削除できます。
+
+Redmine ルートで以下を実行します。
+
+```shell
+bundle exec rake redmine_versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
+```
+
+動作:
+
+- 孤立レコードが 0 件の場合はメッセージを表示して終了します。
+- 孤立レコードがある場合は削除を実行し、削除した Attachment ID を表示します。

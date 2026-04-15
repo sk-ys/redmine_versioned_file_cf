@@ -1,0 +1,11 @@
+en:
+  label_versioned_file: File (revision-managed)
+  versioned_file_cf:
+    error_versioned_file_not_text: Only text files can be uploaded to this custom field.
+    error_versioned_file_unchanged: The file content is unchanged.
+    tasks:
+      cleanup_orphan_attachments:
+        label_none: No orphan attachments found.
+        label_start: Deleting %{count} orphan attachments...
+        label_deleted: "  Deleted: Attachment id=%{id}, disk_filename=%{disk_filename}"
+        label_done: "Done: deleted %{count} attachments."

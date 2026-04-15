@@ -1,0 +1,101 @@
+<%= render layout: 'layouts/versioned_file' do %>
+  <%= form_tag({}, method: 'get') do %>
+    <%= hidden_field_tag(:custom_value_id, params[:custom_value_id]) if params[:custom_value_id].present? %>
+    <%= hidden_field_tag(:revision_id, params[:revision_id]) if params[:revision_id].present? %>
+    <%= hidden_field_tag(:compare_to_id, params[:compare_to_id]) if params[:compare_to_id].present? %>
+    <%= hidden_field_tag(:scm_path, params[:scm_path]) if params[:scm_path].present? %>
+    <%= hidden_field_tag(:scm_rev, params[:scm_rev]) if params[:scm_rev].present? %>
+    <%= hidden_field_tag(:scm_rev_from, params[:scm_rev_from]) if params[:scm_rev_from].present? %>
+    <%= hidden_field_tag(:scm_rev_to, params[:scm_rev_to]) if params[:scm_rev_to].present? %>
+    <p>
+      <%= l(:label_view_diff) %>:
+      <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', onchange: 'this.form.submit()' %> <%= l(:label_diff_inline) %></label>
+      <label><%= radio_button_tag 'type', 'sbs', @diff_type == 'sbs', onchange: 'this.form.submit()' %> <%= l(:label_diff_side_by_side) %></label>
+    </p>
+  <% end %>
+
+  <p>
+    <%= l(:label_revision) %> <%= link_to_attachment @previous_revision.attachment, text: "#{@previous_revision.revision_number}" %>
+    <em>(<%= @previous_revision.author || l(:label_user_anonymous) %>, <%= format_time(@previous_revision.created_at) %>)</em>
+    &#8594;
+    <%= l(:label_revision) %> <%= link_to_attachment @revision.attachment, text: "#{@revision.revision_number}" %>
+    <em>(<%= @revision.author || l(:label_user_anonymous) %>, <%= format_time(@revision.created_at) %>)</em>
+  </p>
+
+  <% @diff.each do |table_file| %>
+    <div class="autoscroll">
+      <% if @diff.diff_type == 'sbs' %>
+        <table class="filecontent diffcontent">
+          <thead>
+            <tr>
+              <th></th>
+                <% if table_file.previous_file_name %>
+                  <th class="filename">
+                    <span class="previous-filename"><%= table_file.previous_file_name %></span>
+                  </th>
+                  <th></th>
+                  <th class="filename">
+                    <%= table_file.file_name %>
+                  </th>
+                <% else %>
+                  <th colspan="3" class="filename">
+                    <%= table_file.file_name %>
+                  </th>
+                <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% table_file.each_line do |spacing, line| %>
+              <% if spacing %>
+                <tr class="spacing">
+                  <th class="line-num" data-txt="..."></th><td></td><th class="line-num" data-txt="..."></th><td></td>
+                </tr>
+              <% end %>
+              <tr>
+                <th class="line-num" data-txt="<%= line.nb_line_left %>"></th>
+                <td class="line-code <%= line.type_diff_left %>">
+                  <div><%= line.html_line_left.html_safe %></div>
+                </td>
+                <th class="line-num" data-txt="<%= line.nb_line_right %>"></th>
+                <td class="line-code <%= line.type_diff_right %>">
+                  <div><%= line.html_line_right.html_safe %></div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <table class="filecontent diffcontent">
+          <thead>
+            <tr>
+              <th colspan="3" class="filename">
+                <% if table_file.previous_file_name %>
+                  <span class="previous-filename"><%= table_file.previous_file_name %> &#8594;</span>
+                <% end %>
+                <%= table_file.file_name %>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <% table_file.each_line do |spacing, line| %>
+              <% if spacing %>
+                <tr class="spacing">
+                  <th class="line-num">...</th><th class="line-num">...</th><td></td>
+                </tr>
+              <% end %>
+              <tr>
+                <th class="line-num" data-txt="<%= line.nb_line_left %>"></th>
+                <th class="line-num" data-txt="<%= line.nb_line_right %>"></th>
+                <td class="line-code <%= line.type_diff %>">
+                  <div><%= line.html_line.html_safe %></div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= l(:text_diff_truncated) if @diff.truncated? %>
+<% end %>

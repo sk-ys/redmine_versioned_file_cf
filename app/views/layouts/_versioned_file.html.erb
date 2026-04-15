@@ -1,0 +1,27 @@
+<% if @diff_download_path.present? %>
+  <div class="contextual">
+    <%= link_to sprite_icon('download', 'Unified diff'), @diff_download_path, class: 'icon icon-download' %>
+  </div>
+<% end %>
+
+<h2>
+  <%= safe_join([
+    link_to_record(@custom_value.customized),
+    link_to(@custom_field.name + ' - ' + l(:label_history), history_versioned_files_path(custom_value_id: @custom_value.id)),
+    @attachment.filename
+  ], ' » ') %>
+</h2>
+
+<div class="attachments">
+  <p><%= "#{@attachment.description} - " unless @attachment.description.blank? %>
+     <span class="author"><%= link_to_user(@attachment.author) %>, <%= format_time(@attachment.created_on) %></span></p>
+</div>
+<div class="filecontent-container">
+  <%= yield %>
+</div>
+
+<% html_title @attachment.filename %>
+
+<% content_for :header_tags do -%>
+  <%= stylesheet_link_tag 'scm' -%>
+<% end -%>

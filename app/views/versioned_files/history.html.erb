@@ -1,0 +1,50 @@
+<h2>
+  <%= safe_join([
+    link_to_record(@custom_value.customized),
+    @custom_field.name + ' - ' + l(:label_history)
+  ], ' » ') %>
+</h2>
+
+<% html_title "#{@custom_value.customized} » #{@custom_field.name} - #{l(:label_history)}" %>
+
+<%= form_tag(compare_versioned_files_path, method: :get) do %>
+  <% show_diff = @revisions.size > 1 %>
+  <%= hidden_field_tag :custom_value_id, @custom_value.id %>
+  <% if show_diff %>
+    <p><%= submit_tag l(:label_view_diff) %></p>
+  <% end %>
+  <table class="list wiki-page-versions">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th></th>
+        <th></th>
+        <th><%= l(:field_updated_on) %></th>
+        <th><%= l(:field_author) %></th>
+        <th><%= l(:field_filename) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% line_num = 1 %>
+      <% @revisions.each do |revision| %>
+        <tr class="wiki-page-version">
+          <td class="id">r<%= revision.revision_number %></td>
+          <td class="checkbox"><%= radio_button_tag('revision_id', revision.id, (line_num == 1), id: "cb-#{line_num}", onclick: "$('#cbto-#{line_num + 1}').prop('checked', true);") if show_diff && (line_num < @revisions.size) %></td>
+          <td class="checkbox"><%= radio_button_tag('compare_to_id', revision.id, (line_num == 2), id: "cbto-#{line_num}") if show_diff && (line_num > 1) %></td>
+          <td class="updated_on"><%= format_time(revision.created_at) %></td>
+          <td class="author"><%= link_to_user revision.author %></td>
+          <td class="filename"><%= link_to_attachment revision.attachment %></td>
+          <td class="buttons">
+            <%= link_to l(:button_download), download_named_attachment_path(revision.attachment, revision.attachment.filename) %>
+          </td>
+        </tr>
+        <% line_num += 1 %>
+      <% end %>
+    </tbody>
+  </table>
+  <% if show_diff %>
+    <p><%= submit_tag l(:label_view_diff) %></p>
+  <% end %>
+  <span class="pagination"><%= pagination_links_full @version_pages, @version_count %></span>
+<% end %>

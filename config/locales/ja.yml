@@ -1,0 +1,11 @@
+ja:
+  label_versioned_file: ファイル（リビジョン管理）
+  versioned_file_cf:
+    error_versioned_file_not_text: このカスタムフィールドにはテキストファイルのみアップロードできます。
+    error_versioned_file_unchanged: 内容が同一です。
+    tasks:
+      cleanup_orphan_attachments:
+        label_none: 孤立した Attachment はありません。
+        label_start: "%{count} 件の孤立した Attachment を削除します..."
+        label_deleted: "  削除: Attachment id=%{id}, disk_filename=%{disk_filename}"
+        label_done: "完了: %{count} 件削除しました。"
