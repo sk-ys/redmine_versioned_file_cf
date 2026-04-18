@@ -9,3 +9,20 @@ ja:
         label_start: "%{count} 件の孤立した Attachment を削除します..."
         label_deleted: "  削除: Attachment id=%{id}, disk_filename=%{disk_filename}"
         label_done: "完了: %{count} 件削除しました。"
+      migrate_file_custom_field:
+        label_start: "カスタムフィールド id=%{id}（%{name}）を確認しています... 全値=%{total} 件、添付あり=%{filled} 件"
+        label_invalid_header: "移行を中止しました。%{count} 件の値は移行できません。"
+        label_invalid_value: "  CustomValue id=%{custom_value_id}（%{customized_type}#%{customized_id}, attachment=%{attachment_id}）: %{reason}"
+        label_dry_run: "ドライラン完了: %{count} 件の値を移行できます。"
+        label_done_no_values: 値が入っているデータはなかったため、フィールド形式のみ Versioned file に変更しました。
+        label_done: "完了: %{count} 件の値を移行し、フィールド形式を Versioned file に変更しました。"
+        error_missing_custom_field_id: ID を指定してください。
+        error_custom_field_not_found: "カスタムフィールド id=%{id} が見つかりません。"
+        error_already_versioned_file: "カスタムフィールド id=%{id} は既に Versioned file です。"
+        error_invalid_field_format: "カスタムフィールド id=%{id} はファイルカスタムフィールドではありません（現在の形式: %{field_format}）。"
+        error_aborted: 移行を中止しました。
+        reason_attachment_id_invalid: 値に有効な Attachment ID が入っていません。
+        reason_attachment_missing: Attachment が見つかりません。
+        reason_attachment_not_owned: Attachment がこの CustomValue に紐付いていません。
+        reason_attachment_not_text: テキスト Attachment のみ移行できます。
+        reason_already_migrated: この CustomValue には既にリビジョンがあります。

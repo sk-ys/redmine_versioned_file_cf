@@ -11,6 +11,17 @@ if plugin.latest_migration.to_i > current_version
 end
 
 module VersionedFileCfTestHelper
+  def create_issue_attachment_custom_field(name: 'File')
+    field = IssueCustomField.new(
+      name: name,
+      field_format: 'attachment',
+      is_for_all: true,
+      trackers: [Tracker.find(1)]
+    )
+    assert field.save, field.errors.full_messages.join(', ')
+    field
+  end
+
   def create_issue_versioned_file_custom_field(name: 'Revision file')
     field = IssueCustomField.new(
       name: name,
@@ -24,6 +35,17 @@ module VersionedFileCfTestHelper
 
   def create_custom_value(issue: Issue.find(1), custom_field: create_issue_versioned_file_custom_field, value: '')
     CustomValue.create!(customized: issue, custom_field: custom_field, value: value)
+  end
+
+  def create_attachment_for_custom_value(custom_value:, fixture:, mime_type: nil, author: User.find(1))
+    attachment = Attachment.create!(
+      container: custom_value,
+      file: uploaded_test_file(fixture, mime_type || Rack::Mime.mime_type(File.extname(fixture), 'text/plain')),
+      author: author
+    )
+
+    custom_value.update!(value: attachment.id.to_s)
+    attachment
   end
 
   def create_revision(custom_value:, fixture:, content:, revision_number:, active:, author: User.find(1))

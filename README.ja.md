@@ -74,10 +74,26 @@ bundle exec rails test plugins/redmine_versioned_file_cf/test RAILS_ENV=test
 Redmine ルートで以下を実行します。
 
 ```shell
-bundle exec rake redmine_versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
+bundle exec rake versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
+```
+
+既存のファイルカスタムフィールドを Versioned file に置き換えることもできます。
+
+Redmine ルートで以下を実行します。
+
+```shell
+bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 RAILS_ENV=production
+```
+
+データを変更せず移行可否だけ確認する場合は以下を実行します。
+
+```shell
+bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
 ```
 
 動作:
 
 - 孤立レコードが 0 件の場合はメッセージを表示して終了します。
 - 孤立レコードがある場合は削除を実行し、削除した Attachment ID を表示します。
+- 移行 task の対象は、既存のファイルカスタムフィールド形式の custom field のみです。
+- 添付済みの値にテキスト以外のファイルや不整合な Attachment が含まれる場合は、変更を加えずに移行を中止します。

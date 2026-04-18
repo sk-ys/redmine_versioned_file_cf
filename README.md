@@ -75,10 +75,26 @@ If needed, you can remove orphan attachments whose container record has already 
 Run the following from your Redmine root directory:
 
 ```shell
-bundle exec rake redmine_versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
+bundle exec rake versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
+```
+
+You can also replace an existing file custom field with Versioned file.
+
+Run the following from your Redmine root directory:
+
+```shell
+bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 RAILS_ENV=production
+```
+
+To check migratability without changing data:
+
+```shell
+bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
 ```
 
 Behavior:
 
 - If there are no orphan records, it prints a message and exits.
 - If orphan records exist, it deletes them and prints the deleted attachment IDs.
+- The migration task only targets custom fields whose format is the existing file custom field.
+- If any attached value is not a text file or has inconsistent attachment data, the migration is aborted without applying changes.
