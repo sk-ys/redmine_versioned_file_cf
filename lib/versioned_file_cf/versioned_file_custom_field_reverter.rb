@@ -1,17 +1,7 @@
 # frozen_string_literal: true
 
 module VersionedFileCf
-  class VersionedFileCustomFieldReverter
-    MigrationError = Class.new(StandardError)
-
-    InvalidValue = Struct.new(
-      :custom_value_id,
-      :customized_type,
-      :customized_id,
-      :attachment_id,
-      :reason,
-      keyword_init: true
-    )
+  class VersionedFileCustomFieldReverter < CustomFieldConversionBase
 
     Result = Struct.new(
       :custom_field,
@@ -26,11 +16,6 @@ module VersionedFileCf
       def success?
         invalid_values.empty?
       end
-    end
-
-    def initialize(custom_field_id:, dry_run: false)
-      @custom_field_id = custom_field_id
-      @dry_run = dry_run
     end
 
     def call
@@ -62,10 +47,10 @@ module VersionedFileCf
         migrated_values_count: 0,
         deleted_revisions_count: deleted_revisions_count,
         invalid_values: invalid_values,
-        dry_run: @dry_run
+        dry_run: dry_run
       )
 
-      return result if invalid_values.any? || @dry_run
+      return result if invalid_values.any? || dry_run
 
       reverted_values_count = 0
       deleted_revisions_count = 0
@@ -87,22 +72,12 @@ module VersionedFileCf
     private
 
     def load_custom_field!
-      custom_field = CustomField.find_by(id: @custom_field_id)
-      raise MigrationError, I18n.t('versioned_file_cf.tasks.revert_file_custom_field.error_custom_field_not_found', id: @custom_field_id) unless custom_field
-
-      if custom_field.field_format == 'attachment'
-        raise MigrationError, I18n.t('versioned_file_cf.tasks.revert_file_custom_field.error_already_file', id: custom_field.id)
-      end
-
-      unless custom_field.field_format == 'versioned_file'
-        raise MigrationError, I18n.t(
-          'versioned_file_cf.tasks.revert_file_custom_field.error_invalid_field_format',
-          id: custom_field.id,
-          field_format: custom_field.field_format
-        )
-      end
-
-      custom_field
+      super(
+        expected_format: 'versioned_file',
+        already_format: 'attachment',
+        already_error_key: 'versioned_file_cf.tasks.revert_file_custom_field.error_already_file',
+        invalid_error_key: 'versioned_file_cf.tasks.revert_file_custom_field.error_invalid_field_format'
+      )
     end
 
     def assess_custom_value(custom_value)
@@ -149,19 +124,6 @@ module VersionedFileCf
       }
     end
 
-    def invalid_result(custom_value, attachment_id, reason)
-      {
-        status: :invalid,
-        invalid_value: InvalidValue.new(
-          custom_value_id: custom_value.id,
-          customized_type: custom_value.customized_type,
-          customized_id: custom_value.customized_id,
-          attachment_id: attachment_id,
-          reason: reason
-        )
-      }
-    end
-
     def revert_custom_value!(payload)
       custom_value = payload[:custom_value]
       active_revision = payload[:active_revision]
@@ -182,18 +144,6 @@ module VersionedFileCf
       end
 
       deleted_revisions_count
-    end
-
-    def change_field_format!(custom_field, field_format)
-      custom_field.update_columns(field_format: field_format)
-      custom_field.reload
-    end
-
-    def attachment_id_from(value)
-      string_value = value.to_s.strip
-      return if string_value.blank? || string_value !~ /\A\d+\z/
-
-      string_value.to_i
     end
   end
 end

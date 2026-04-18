@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'versioned_file_cf/field_format'
+require_relative 'versioned_file_cf/custom_field_conversion_base'
 require_relative 'versioned_file_cf/file_custom_field_migrator'
 require_relative 'versioned_file_cf/versioned_file_custom_field_reverter'
 require_relative 'versioned_file_cf/patches/application_helper_patch'

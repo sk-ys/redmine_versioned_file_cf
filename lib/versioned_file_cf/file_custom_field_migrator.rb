@@ -1,17 +1,7 @@
 # frozen_string_literal: true
 
 module VersionedFileCf
-  class FileCustomFieldMigrator
-    MigrationError = Class.new(StandardError)
-
-    InvalidValue = Struct.new(
-      :custom_value_id,
-      :customized_type,
-      :customized_id,
-      :attachment_id,
-      :reason,
-      keyword_init: true
-    )
+  class FileCustomFieldMigrator < CustomFieldConversionBase
 
     Result = Struct.new(
       :custom_field,
@@ -25,11 +15,6 @@ module VersionedFileCf
       def success?
         invalid_values.empty?
       end
-    end
-
-    def initialize(custom_field_id:, dry_run: false)
-      @custom_field_id = custom_field_id
-      @dry_run = dry_run
     end
 
     def call
@@ -59,10 +44,10 @@ module VersionedFileCf
         filled_values_count: populated_values.count,
         migrated_values_count: already_migrated_count,
         invalid_values: invalid_values,
-        dry_run: @dry_run
+        dry_run: dry_run
       )
 
-      return result if invalid_values.any? || @dry_run
+      return result if invalid_values.any? || dry_run
 
       migrated_values_count = already_migrated_count
       CustomField.transaction do
@@ -81,22 +66,12 @@ module VersionedFileCf
     private
 
     def load_custom_field!
-      custom_field = CustomField.find_by(id: @custom_field_id)
-      raise MigrationError, I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.error_custom_field_not_found', id: @custom_field_id) unless custom_field
-
-      if custom_field.field_format == 'versioned_file'
-        raise MigrationError, I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.error_already_versioned_file', id: custom_field.id)
-      end
-
-      unless custom_field.field_format == 'attachment'
-        raise MigrationError, I18n.t(
-          'versioned_file_cf.tasks.migrate_file_custom_field.error_invalid_field_format',
-          id: custom_field.id,
-          field_format: custom_field.field_format
-        )
-      end
-
-      custom_field
+      super(
+        expected_format: 'attachment',
+        already_format: 'versioned_file',
+        already_error_key: 'versioned_file_cf.tasks.migrate_file_custom_field.error_already_versioned_file',
+        invalid_error_key: 'versioned_file_cf.tasks.migrate_file_custom_field.error_invalid_field_format'
+      )
     end
 
     def assess_custom_value(custom_value)
@@ -104,72 +79,54 @@ module VersionedFileCf
       if active_revision
         return { status: :already_migrated } if already_migrated_value?(custom_value, active_revision)
 
-        return {
-          status: :invalid,
-          invalid_value: build_invalid_value(
-            custom_value,
-            custom_value.value,
-            I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_already_migrated')
-          )
-        }
+        return invalid_result(
+          custom_value,
+          custom_value.value,
+          I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_already_migrated')
+        )
       end
 
       if VersionedFileCf::FileRevision.exists?(custom_value_id: custom_value.id)
-        return {
-          status: :invalid,
-          invalid_value: build_invalid_value(
-            custom_value,
-            custom_value.value,
-            I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_already_migrated')
-          )
-        }
+        return invalid_result(
+          custom_value,
+          custom_value.value,
+          I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_already_migrated')
+        )
       end
 
       attachment_id = attachment_id_from(custom_value.value)
       unless attachment_id
-        return {
-          status: :invalid,
-          invalid_value: build_invalid_value(
-            custom_value,
-            custom_value.value,
-            I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_id_invalid')
-          )
-        }
+        return invalid_result(
+          custom_value,
+          custom_value.value,
+          I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_id_invalid')
+        )
       end
 
       attachment = Attachment.find_by(id: attachment_id)
       unless attachment
-        return {
-          status: :invalid,
-          invalid_value: build_invalid_value(
-            custom_value,
-            attachment_id,
-            I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_missing')
-          )
-        }
+        return invalid_result(
+          custom_value,
+          attachment_id,
+          I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_missing')
+        )
       end
 
       unless attachment.container == custom_value
-        return {
-          status: :invalid,
-          invalid_value: build_invalid_value(
-            custom_value,
-            attachment.id,
-            I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_not_owned')
-          )
-        }
+        return invalid_result(
+          custom_value,
+          attachment.id,
+          I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_not_owned')
+        )
       end
 
       return { status: :migratable } if attachment.readable? && attachment.is_text?
 
-      {
-        status: :invalid,
-        invalid_value: build_invalid_value(
-          custom_value,
-          attachment.id,
-          I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_not_text')
-        )
-      }
+      invalid_result(
+        custom_value,
+        attachment.id,
+        I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_not_text')
+      )
     end
 
     def already_migrated_value?(custom_value, active_revision)
@@ -178,16 +135,6 @@ module VersionedFileCf
 
       attachment = Attachment.find_by(id: attachment_id)
       attachment && attachment.container == active_revision
-    end
-
-    def build_invalid_value(custom_value, attachment_id, reason)
-      InvalidValue.new(
-        custom_value_id: custom_value.id,
-        customized_type: custom_value.customized_type,
-        customized_id: custom_value.customized_id,
-        attachment_id: attachment_id,
-        reason: reason
-      )
     end
 
     def migrate_custom_value!(custom_value)
@@ -207,26 +154,6 @@ module VersionedFileCf
       )
 
       attachment.update!(container: revision)
-    end
-
-    def change_field_format!(custom_field, field_format)
-      custom_field.update_columns(field_format: field_format)
-      custom_field.reload
-    end
-
-    def attachment_id_from(value)
-      string_value = value.to_s.strip
-      return if string_value.blank? || string_value !~ /\A\d+\z/
-
-      string_value.to_i
-    end
-
-    def read_text(attachment)
-      content = File.binread(attachment.diskfile)
-      content.force_encoding(Encoding::UTF_8)
-      return content if content.valid_encoding?
-
-      content.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '')
     end
   end
 end

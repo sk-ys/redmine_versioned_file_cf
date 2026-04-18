@@ -7,14 +7,14 @@ namespace :versioned_file_cf do
 
     I18n.with_locale(locale) do
       custom_field_id = ENV['ID'].presence
-      abort I18n.t('versioned_file_cf.tasks.revert_file_custom_field.error_missing_custom_field_id') unless custom_field_id
+      abort I18n.t('versioned_file_cf.tasks.common.error_missing_custom_field_id') unless custom_field_id
 
       dry_run = ActiveModel::Type::Boolean.new.cast(ENV['DRY_RUN'])
       migrator = VersionedFileCf::VersionedFileCustomFieldReverter.new(custom_field_id: custom_field_id, dry_run: dry_run)
       result = migrator.call
 
       puts I18n.t(
-        'versioned_file_cf.tasks.revert_file_custom_field.label_start',
+        'versioned_file_cf.tasks.common.label_start',
         id: result.custom_field.id,
         name: result.custom_field.name,
         total: result.total_values_count,
@@ -23,13 +23,13 @@ namespace :versioned_file_cf do
 
       unless result.success?
         puts I18n.t(
-          'versioned_file_cf.tasks.revert_file_custom_field.label_invalid_header',
+          'versioned_file_cf.tasks.common.label_invalid_header',
           count: result.invalid_values.count
         )
 
         result.invalid_values.each do |invalid_value|
           puts I18n.t(
-            'versioned_file_cf.tasks.revert_file_custom_field.label_invalid_value',
+            'versioned_file_cf.tasks.common.label_invalid_value',
             custom_value_id: invalid_value.custom_value_id,
             customized_type: invalid_value.customized_type,
             customized_id: invalid_value.customized_id,
@@ -38,7 +38,7 @@ namespace :versioned_file_cf do
           )
         end
 
-        abort I18n.t('versioned_file_cf.tasks.revert_file_custom_field.error_aborted')
+        abort I18n.t('versioned_file_cf.tasks.common.error_aborted')
       end
 
       if dry_run
