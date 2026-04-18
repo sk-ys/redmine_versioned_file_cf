@@ -1,6 +1,10 @@
 <% return unless custom_field&.persisted? %>
 <% return unless %w[attachment versioned_file].include?(custom_field.field_format) %>
 
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'versioned_file_conversion_controls', plugin: 'redmine_versioned_file_cf', media: 'all' %>
+<% end %>
+
 <p class="versioned-file-cf-conversion-field">
   <label><%= l('versioned_file_cf.ui.conversion_title') %></label>
   <% if custom_field.field_format == 'attachment' %>
