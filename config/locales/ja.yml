@@ -12,36 +12,36 @@ ja:
       remaining_invalid_values: "  ...ほか %{count} 件"
     tasks:
       common:
-        label_start: "カスタムフィールド id=%{id}（%{name}）を確認しています... 全値=%{total} 件、添付あり=%{filled} 件"
+        label_start: "カスタムフィールド id=%{id}（%{name}）を確認しています... 全=%{total} 件中、添付あり=%{filled} 件"
         label_invalid_header: "処理を中止しました。%{count} 件の値は変換できません。"
         label_invalid_value: "  CustomValue id=%{custom_value_id}（%{customized_type}#%{customized_id}, attachment=%{attachment_id}）: %{reason}"
         error_missing_custom_field_id: ID を指定してください。
         error_custom_field_not_found: "カスタムフィールド id=%{id} が見つかりません。"
         error_aborted: 処理を中止しました。
       cleanup_orphan_attachments:
-        label_none: 孤立した Attachment はありません。
-        label_start: "%{count} 件の孤立した Attachment を削除します..."
-        label_deleted: "  削除: Attachment id=%{id}, disk_filename=%{disk_filename}"
+        label_none: 孤立した添付ファイルはありません。
+        label_start: "%{count} 件の孤立した添付ファイルを削除します..."
+        label_deleted: "  削除: 添付ファイル id=%{id}, disk_filename=%{disk_filename}"
         label_done: "完了: %{count} 件削除しました。"
       migrate_file_custom_field:
         label_dry_run: "ドライラン完了: %{count} 件の値を移行できます。"
-        label_done_no_values: 値が入っているデータはなかったため、フィールド形式のみ Versioned file に変更しました。
-        label_done: "完了: %{count} 件の値を移行し、フィールド形式を Versioned file に変更しました。"
-        error_already_versioned_file: "カスタムフィールド id=%{id} は既に Versioned file です。"
+        label_done_no_values: 値が空だったため、フィールド形式のみファイル（リビジョン管理）形式に変更しました。
+        label_done: "完了: %{count} 件の値を移行し、フィールド形式をファイル（リビジョン管理）形式に変更しました。"
+        error_already_versioned_file: "カスタムフィールド id=%{id} は既にファイル（リビジョン管理）形式です。"
         error_invalid_field_format: "カスタムフィールド id=%{id} はファイルカスタムフィールドではありません（現在の形式: %{field_format}）。"
-        reason_attachment_id_invalid: 値に有効な Attachment ID が入っていません。
-        reason_attachment_missing: Attachment が見つかりません。
-        reason_attachment_not_owned: Attachment がこの CustomValue に紐付いていません。
-        reason_attachment_not_text: テキスト Attachment のみ移行できます。
-        reason_already_migrated: この CustomValue には既にリビジョンがあります。
+        reason_attachment_id_invalid: カスタムフィールド値に有効な添付ファイル ID が入っていません。
+        reason_attachment_missing: 添付ファイルが見つかりません。
+        reason_attachment_not_owned: 添付ファイルがこのカスタムフィールドに紐付いていません。
+        reason_attachment_not_text: テキスト添付ファイルのみ移行できます。
+        reason_already_migrated: このカスタムフィールドには既にリビジョンがあります。
       revert_file_custom_field:
-        label_dry_run: "ドライラン完了: %{count} 件の revision レコードを削除予定です。"
-        label_done_no_values: 履歴がなかったため、フィールド形式のみ File に変更しました。
-        label_done: "完了: %{count} 件の値を File に戻し、%{revisions} 件の revision レコードを削除しました。"
-        error_already_file: "カスタムフィールド id=%{id} は既に File です。"
-        error_invalid_field_format: "カスタムフィールド id=%{id} は Versioned file カスタムフィールドではありません（現在の形式: %{field_format}）。"
-        reason_attachment_id_invalid: 値が current revision の Attachment ID と一致しません。
-        reason_attachment_missing: current revision の Attachment が見つかりません。
-        reason_attachment_not_owned: current revision の Attachment が current revision に紐付いていません。
-        reason_active_revision_missing: active な revision が見つかりません。
-        reason_multiple_active_revisions: active な revision が複数見つかりました。
+        label_dry_run: "ドライラン完了: %{count} 件のリビジョンを削除予定です。"
+        label_done_no_values: 値が空だったため、フィールド形式のみファイル形式に変更しました。
+        label_done: "完了: %{count} 件の値をファイル形式に戻し、%{revisions} 件のリビジョンを削除しました。"
+        error_already_file: "カスタムフィールド id=%{id} は既にファイル形式です。"
+        error_invalid_field_format: "カスタムフィールド id=%{id} はファイル（リビジョン管理）形式カスタムフィールドではありません（現在の形式: %{field_format}）。"
+        reason_attachment_id_invalid: カスタムフィールド値が最新のリビジョンの添付ファイル ID と一致しません。
+        reason_attachment_missing: 最新のリビジョンの添付ファイルが見つかりません。
+        reason_attachment_not_owned: 最新のリビジョンの添付ファイルがファイル（リビジョン管理）形式のカスタムフィールドに紐付いていません。
+        reason_active_revision_missing: アクティブなリビジョンが見つかりません。
+        reason_multiple_active_revisions: アクティブなリビジョンが複数見つかりました。

@@ -25,9 +25,9 @@ en:
         label_done: "Done: deleted %{count} attachments."
       migrate_file_custom_field:
         label_dry_run: "Dry run completed. %{count} values can be migrated."
-        label_done_no_values: Field format changed to Versioned file. No populated values were found.
-        label_done: "Done. Migrated %{count} values and changed the field format to Versioned file."
-        error_already_versioned_file: "Custom field id=%{id} is already Versioned file."
+        label_done_no_values: Field format changed to Versioned file format. No populated values were found.
+        label_done: "Done. Migrated %{count} values and changed the field format to Versioned file format."
+        error_already_versioned_file: "Custom field id=%{id} is already Versioned file format."
         error_invalid_field_format: "Custom field id=%{id} is not a file custom field (current format: %{field_format})."
         reason_attachment_id_invalid: The value does not contain a valid attachment id.
         reason_attachment_missing: The attachment could not be found.
@@ -36,12 +36,12 @@ en:
         reason_already_migrated: A revision already exists for this custom value.
       revert_file_custom_field:
         label_dry_run: "Dry run completed. %{count} revision records would be deleted."
-        label_done_no_values: Field format changed to File. No revision history was found.
-        label_done: "Done. Reverted %{count} values to File and deleted %{revisions} revision records."
-        error_already_file: "Custom field id=%{id} is already File."
+        label_done_no_values: Field format changed to File format. No revision history was found.
+        label_done: "Done. Reverted %{count} values to File format and deleted %{revisions} revision records."
+        error_already_file: "Custom field id=%{id} is already File format."
         error_invalid_field_format: "Custom field id=%{id} is not a Versioned file custom field (current format: %{field_format})."
         reason_attachment_id_invalid: The value does not match the current revision attachment id.
         reason_attachment_missing: The attachment for the current revision could not be found.
-        reason_attachment_not_owned: The current revision attachment is not associated with the current revision.
+        reason_attachment_not_owned: The current revision attachment is not associated with the revision-managed file custom field.
         reason_active_revision_missing: No active revision could be found.
         reason_multiple_active_revisions: Multiple active revisions were found.
