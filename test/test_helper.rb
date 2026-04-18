@@ -66,7 +66,7 @@ module VersionedFileCfTestHelper
     )
 
     attachment.update!(container: revision)
-    custom_value.update!(value: attachment.id.to_s) if active
+    custom_value.update_columns(value: attachment.id.to_s) if active
     revision
   end
 end
