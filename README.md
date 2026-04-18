@@ -56,21 +56,19 @@ Restart Redmine.
 <a id="ui-conversion-en"></a>
 ### Converting Existing Custom Fields from the UI
 
-On the custom field edit screen, this plugin adds a conversion button only for `File` and `File (revision-managed)` formats.
+The conversion button is shown only on the edit screen for custom fields of type `File` or `File (revision-managed)`.
 
-- `File` -> `File (revision-managed)`: converts the existing file custom field to the revision-managed format.
-- `File (revision-managed)` -> `File`: converts the field back to the normal file format.
+- `File` -> `File (revision-managed)`: Converts the existing File custom field format to the revision-managed format.
+- `File (revision-managed)` -> `File`: Converts back to the normal File custom field format.
 
-When converting from `File (revision-managed)` to `File`, all revision history in the `vfcf_file_revisions` table and any past attachments are deleted. The current file is kept as the normal file custom field attachment.
+When converting from `File (revision-managed)` to `File`, all revision history in the `vfcf_file_revisions` table and any past attachments are deleted, and only the latest file is kept as the normal File custom field attachment.
 
 <a id="maintenance-en"></a>
 ## Maintenance
 
 ### Remove orphan attachments
 
-If needed, you can remove orphan attachments whose container record has already been deleted.
-
-Run the following from your Redmine root directory:
+If needed, you can remove orphan attachments whose container record has already been deleted by running the following from your Redmine root directory:
 
 ```shell
 bundle exec rake versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
@@ -82,9 +80,7 @@ bundle exec rake versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=producti
 
 ### Convert File to Versioned file
 
-You can also replace an existing File custom field with the `File (revision-managed)` format.
-
-Run the following from your Redmine root directory:
+You can also replace an existing File custom field with the `File (revision-managed)` format by running the following from your Redmine root directory:
 
 ```shell
 bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 RAILS_ENV=production
@@ -98,13 +94,11 @@ bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAI
 
 #### Notes
 - The migration task only targets custom fields whose format is the existing File custom field.
-- If any attached value contains a non-text file or inconsistent attachment data, the migration is aborted without applying changes.
+- If the existing File custom field contains any non-text files or inconsistent attachments, the migration is aborted without applying changes.
 
 ### Convert Versioned file to File
 
-You can also convert an existing `File (revision-managed)` custom field back to the normal File format. In this case, the current file is preserved, and the revision history stored in the `vfcf_file_revisions` table and any past attachments are deleted.
-
-Run the following from your Redmine root directory:
+You can also convert an existing `File (revision-managed)` custom field back to the normal `File` format, run the following from your Redmine root directory:
 
 ```shell
 bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 RAILS_ENV=production
