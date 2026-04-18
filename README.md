@@ -10,6 +10,8 @@ Japanese version: [README.ja.md](README.ja.md)
 - Supports file uploads in the same way as the existing file custom field
 - Shows the history of uploaded files
 - Shows diffs between revisions
+- Lets you switch between `File` and `File (revision-managed)` using dedicated conversion buttons in the UI ([details](#ui-conversion-en))
+- Provides rake tasks for orphan attachment cleanup and custom field format conversion ([details](#maintenance-en))
 
 ### Notes
 
@@ -41,6 +43,7 @@ bundle exec rake redmine:plugins:migrate NAME=redmine_versioned_file_cf RAILS_EN
 ### 3. Restart Redmine
 Restart Redmine.
 
+<a id="usage-en"></a>
 ## Usage
 
 1. Create a new custom field from Administration (choose any object such as Issue, Project, or Version).
@@ -48,6 +51,74 @@ Restart Redmine.
 3. Configure allowed extensions if needed.
 4. Upload a text file from the edit screen of each object.
 5. A history list and diff links are shown at the bottom of the details page.
+
+<a id="ui-conversion-en"></a>
+### Converting Existing Custom Fields from the UI
+
+On the custom field edit screen, this plugin adds a conversion button only for `File` and `File (revision-managed)` formats.
+
+- `File` -> `File (revision-managed)`: converts the existing file custom field to the revision-managed format.
+- `File (revision-managed)` -> `File`: converts the field back to the normal file format.
+
+When converting from `File (revision-managed)` to `File`, all revision history stored in `vfcf_file_revisions` is deleted. The current file is kept as the normal file custom field attachment.
+
+<a id="maintenance-en"></a>
+## Maintenance
+
+### Remove orphan attachments
+
+If needed, you can remove orphan attachments whose container record has already been deleted.
+
+Run the following from your Redmine root directory:
+
+```shell
+bundle exec rake versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
+```
+
+#### Notes
+- If there are no orphan records, the task prints a message and exits.
+- If orphan records exist, the task deletes them and prints the deleted attachment IDs.
+
+### Convert File to Versioned file
+
+You can also replace an existing File custom field with the `File (revision-managed)` format.
+
+Run the following from your Redmine root directory:
+
+```shell
+bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 RAILS_ENV=production
+```
+
+To check migratability without changing data:
+
+```shell
+bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
+```
+
+#### Notes
+- The migration task only targets custom fields whose format is the existing File custom field.
+- If any attached value contains a non-text file or inconsistent attachment data, the migration is aborted without applying changes.
+
+### Convert Versioned file to File
+
+You can also convert an existing `File (revision-managed)` custom field back to the normal File format. In this case, the current file is preserved, and the revision history and past attachments stored in `vfcf_file_revisions` are deleted.
+
+Run the following from your Redmine root directory:
+
+```shell
+bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 RAILS_ENV=production
+```
+
+To check revertability without changing data:
+
+```shell
+bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
+```
+
+#### Notes
+- The revert task only targets custom fields whose format is `File (revision-managed)`.
+- The revert task returns the latest file to a normal File custom field attachment and deletes all revision records and past attachments.
+
 
 ## Testing
 
@@ -67,18 +138,3 @@ bundle exec rails test plugins/redmine_versioned_file_cf/test RAILS_ENV=test
 Notes:
 
 - If you encounter a minitest / SimpleCov loading issue, add `MT_NO_PLUGINS=1` at the beginning of the command.
-
-## Maintenance
-
-If needed, you can remove orphan attachments whose container record has already been deleted.
-
-Run the following from your Redmine root directory:
-
-```shell
-bundle exec rake redmine_versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
-```
-
-Behavior:
-
-- If there are no orphan records, it prints a message and exits.
-- If orphan records exist, it deletes them and prints the deleted attachment IDs.
