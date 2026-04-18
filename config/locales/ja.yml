@@ -26,3 +26,20 @@ ja:
         reason_attachment_not_owned: Attachment がこの CustomValue に紐付いていません。
         reason_attachment_not_text: テキスト Attachment のみ移行できます。
         reason_already_migrated: この CustomValue には既にリビジョンがあります。
+      revert_file_custom_field:
+        label_start: "カスタムフィールド id=%{id}（%{name}）を確認しています... 全値=%{total} 件、添付あり=%{filled} 件"
+        label_invalid_header: "変換を中止しました。%{count} 件の値は変換できません。"
+        label_invalid_value: "  CustomValue id=%{custom_value_id}（%{customized_type}#%{customized_id}, attachment=%{attachment_id}）: %{reason}"
+        label_dry_run: "ドライラン完了: %{count} 件の revision レコードを削除予定です。"
+        label_done_no_values: 履歴がなかったため、フィールド形式のみ File に変更しました。
+        label_done: "完了: %{count} 件の値を File に戻し、%{revisions} 件の revision レコードを削除しました。"
+        error_missing_custom_field_id: ID を指定してください。
+        error_custom_field_not_found: "カスタムフィールド id=%{id} が見つかりません。"
+        error_already_file: "カスタムフィールド id=%{id} は既に File です。"
+        error_invalid_field_format: "カスタムフィールド id=%{id} は Versioned file カスタムフィールドではありません（現在の形式: %{field_format}）。"
+        error_aborted: 変換を中止しました。
+        reason_attachment_id_invalid: 値が current revision の Attachment ID と一致しません。
+        reason_attachment_missing: current revision の Attachment が見つかりません。
+        reason_attachment_not_owned: current revision の Attachment が current revision に紐付いていません。
+        reason_active_revision_missing: active な revision が見つかりません。
+        reason_multiple_active_revisions: active な revision が複数見つかりました。

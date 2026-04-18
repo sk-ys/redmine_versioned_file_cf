@@ -91,9 +91,25 @@ bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 RAILS_ENV=pro
 bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
 ```
 
+既存の Versioned file カスタムフィールドを File に戻すこともできます。このとき現在のファイルは保持し、`vfcf_file_revisions` の履歴は削除します。
+
+Redmine ルートで以下を実行します。
+
+```shell
+bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 RAILS_ENV=production
+```
+
+データを変更せず変換可否だけ確認する場合は以下を実行します。
+
+```shell
+bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
+```
+
 動作:
 
 - 孤立レコードが 0 件の場合はメッセージを表示して終了します。
 - 孤立レコードがある場合は削除を実行し、削除した Attachment ID を表示します。
 - 移行 task の対象は、既存のファイルカスタムフィールド形式の custom field のみです。
 - 添付済みの値にテキスト以外のファイルや不整合な Attachment が含まれる場合は、変更を加えずに移行を中止します。
+- 復元 task の対象は、Versioned file 形式の custom field のみです。
+- 復元 task は current のファイルを通常の file custom field の添付へ戻し、履歴レコードをすべて削除します。

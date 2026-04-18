@@ -92,9 +92,25 @@ To check migratability without changing data:
 bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
 ```
 
+You can also replace an existing Versioned file custom field with File. The current file is preserved and the revision history in `vfcf_file_revisions` is deleted.
+
+Run the following from your Redmine root directory:
+
+```shell
+bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 RAILS_ENV=production
+```
+
+To check revertability without changing data:
+
+```shell
+bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 DRY_RUN=1 RAILS_ENV=production
+```
+
 Behavior:
 
 - If there are no orphan records, it prints a message and exits.
 - If orphan records exist, it deletes them and prints the deleted attachment IDs.
 - The migration task only targets custom fields whose format is the existing file custom field.
 - If any attached value is not a text file or has inconsistent attachment data, the migration is aborted without applying changes.
+- The revert task only targets custom fields whose format is Versioned file.
+- The revert task keeps the current file as a normal file custom field attachment and deletes all revision history records.

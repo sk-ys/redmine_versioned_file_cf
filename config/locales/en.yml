@@ -26,3 +26,20 @@ en:
         reason_attachment_not_owned: The attachment is not associated with this custom value.
         reason_attachment_not_text: Only text attachments can be migrated.
         reason_already_migrated: A revision already exists for this custom value.
+      revert_file_custom_field:
+        label_start: "Checking custom field id=%{id} (%{name})... total values=%{total}, values with attachments=%{filled}"
+        label_invalid_header: "Revert aborted. %{count} values cannot be migrated:"
+        label_invalid_value: "  CustomValue id=%{custom_value_id} (%{customized_type}#%{customized_id}, attachment=%{attachment_id}): %{reason}"
+        label_dry_run: "Dry run completed. %{count} revision records would be deleted."
+        label_done_no_values: Field format changed to File. No revision history was found.
+        label_done: "Done. Reverted %{count} values to File and deleted %{revisions} revision records."
+        error_missing_custom_field_id: Please specify ID.
+        error_custom_field_not_found: "Custom field id=%{id} was not found."
+        error_already_file: "Custom field id=%{id} is already File."
+        error_invalid_field_format: "Custom field id=%{id} is not a Versioned file custom field (current format: %{field_format})."
+        error_aborted: Revert has been aborted.
+        reason_attachment_id_invalid: The value does not match the current revision attachment id.
+        reason_attachment_missing: The attachment for the current revision could not be found.
+        reason_attachment_not_owned: The current revision attachment is not associated with the current revision.
+        reason_active_revision_missing: No active revision could be found.
+        reason_multiple_active_revisions: Multiple active revisions were found.
