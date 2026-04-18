@@ -15,7 +15,8 @@
 
 ### 注意
 
-- アップロード対象はテキストファイルを前提としています
+- アップロードファイルはテキストファイルを想定しています
+- サーバー上に Git がない場合は Redmine 標準のファイル差分機能を使用し、Git がある場合は `git diff --no-index` の結果を表示します
 - 差分ファイルのダウンロードにはサーバー上に Git が必要です
 
 ## インストール
@@ -45,21 +46,21 @@ Redmine を再起動してください。
 <a id="usage-ja"></a>
 ## 使い方
 
-1. 管理画面で custom field を新規作成します（Issue・Project・Version など任意のオブジェクトを選択）。
+1. 管理画面でカスタムフィールドを新規作成します（Issue・Project・Version など任意のオブジェクトで作成可能）。
 2. フォーマットに `ファイル（リビジョン管理）` を選びます。
-3. 必要なら許可拡張子を設定します。
+3. 必要に応じて許可する拡張子を設定します。
 4. 各オブジェクトの編集画面からテキストファイルをアップロードします。
 5. 詳細画面の下部に履歴一覧と差分リンクが表示されます。
 
 <a id="ui-conversion-ja"></a>
 ### 既存カスタムフィールドの UI からの変換
 
-custom field の編集画面では、`ファイル` 形式と `ファイル（リビジョン管理）` 形式のときだけ、専用の変換ボタンが表示されます。
+カスタムフィールドの編集画面では、`ファイル` 形式と `ファイル（リビジョン管理）` 形式のときだけ、専用の変換ボタンが表示されます。
 
 - `ファイル` -> `ファイル（リビジョン管理）`: 既存のファイルカスタムフィールドをリビジョン管理形式へ変換します。
 - `ファイル（リビジョン管理）` -> `ファイル`: 通常のファイル形式へ戻します。
 
-`ファイル（リビジョン管理）` から `ファイル` へ変換する場合、`vfcf_file_revisions` に保存されている履歴はすべて削除されます。現在のファイルは通常のファイルカスタムフィールドの添付として保持されます。
+`ファイル（リビジョン管理）` から `ファイル` へ変換する場合、`vfcf_file_revisions` テーブルに保存されている履歴情報と過去の添付ファイルはすべて削除されます。最新のファイルのみ通常のファイル形式カスタムフィールドの添付ファイルとして保持されます。
 
 
 <a id="maintenance-ja"></a>
@@ -69,7 +70,7 @@ custom field の編集画面では、`ファイル` 形式と `ファイル（�
 
 必要に応じて、コンテナレコードが既に削除された孤立した添付ファイルを以下のコマンドで削除できます。
 
-Redmine ルートで以下を実行します。
+Redmine ルートで以下を実行してください。
 
 ```shell
 bundle exec rake versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=production
@@ -83,7 +84,7 @@ bundle exec rake versioned_file_cf:cleanup_orphan_attachments RAILS_ENV=producti
 
 既存のファイルカスタムフィールドを`ファイル（リビジョン管理）形式`に置き換えることもできます。
 
-Redmine ルートで以下を実行します。
+Redmine ルートで以下を実行してください。
 
 ```shell
 bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 RAILS_ENV=production
@@ -101,9 +102,9 @@ bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAI
 
 ### `ファイル（リビジョン管理）形式`から`ファイル形式`への変換（復元 task）
 
-既存の`ファイル（リビジョン管理）形式`カスタムフィールドを`ファイル形式`に戻すこともできます。このとき現在のファイルは保持し、`vfcf_file_revisions` テーブル内の履歴情報および過去の添付ファイルは削除されます。
+既存の`ファイル（リビジョン管理）形式`カスタムフィールドを`ファイル形式`に戻すこともできます。このとき最新のファイルは保持し、`vfcf_file_revisions` テーブル内の履歴情報および過去の添付ファイルは削除されます。
 
-Redmine ルートで以下を実行します。
+Redmine ルートで以下を実行してください。
 
 ```shell
 bundle exec rake versioned_file_cf:revert_file_custom_field ID=12 RAILS_ENV=production

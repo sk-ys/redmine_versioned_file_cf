@@ -16,7 +16,8 @@ Japanese version: [README.ja.md](README.ja.md)
 ### Notes
 
 - This plugin assumes uploaded files are text files
-- Git must be available on the server to download diff files
+- If Git is not available on the server, the standard Redmine file diff feature is used; if Git is available, the result of `git diff --no-index` is displayed.
+- Git is required on the server to download diff files.
 
 ## Installation
 
@@ -46,7 +47,7 @@ Restart Redmine.
 <a id="usage-en"></a>
 ## Usage
 
-1. Create a new custom field from Administration (choose any object such as Issue, Project, or Version).
+1. Create a new custom field from Administration (for any object such as Issue, Project, or Version).
 2. Select `File (revision-managed)` as the format.
 3. Configure allowed extensions if needed.
 4. Upload a text file from the edit screen of each object.
@@ -60,7 +61,7 @@ On the custom field edit screen, this plugin adds a conversion button only for `
 - `File` -> `File (revision-managed)`: converts the existing file custom field to the revision-managed format.
 - `File (revision-managed)` -> `File`: converts the field back to the normal file format.
 
-When converting from `File (revision-managed)` to `File`, all revision history stored in `vfcf_file_revisions` is deleted. The current file is kept as the normal file custom field attachment.
+When converting from `File (revision-managed)` to `File`, all revision history in the `vfcf_file_revisions` table and any past attachments are deleted. The current file is kept as the normal file custom field attachment.
 
 <a id="maintenance-en"></a>
 ## Maintenance
@@ -101,7 +102,7 @@ bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAI
 
 ### Convert Versioned file to File
 
-You can also convert an existing `File (revision-managed)` custom field back to the normal File format. In this case, the current file is preserved, and the revision history and past attachments stored in `vfcf_file_revisions` are deleted.
+You can also convert an existing `File (revision-managed)` custom field back to the normal File format. In this case, the current file is preserved, and the revision history stored in the `vfcf_file_revisions` table and any past attachments are deleted.
 
 Run the following from your Redmine root directory:
 
