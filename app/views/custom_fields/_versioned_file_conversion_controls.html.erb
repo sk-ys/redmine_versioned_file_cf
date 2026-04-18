@@ -1,0 +1,29 @@
+<% return unless custom_field&.persisted? %>
+<% return unless %w[attachment versioned_file].include?(custom_field.field_format) %>
+
+<p class="versioned-file-cf-conversion-field">
+  <label><%= l('versioned_file_cf.ui.conversion_title') %></label>
+  <% if custom_field.field_format == 'attachment' %>
+    <%= link_to(
+          sprite_icon('reload', l('versioned_file_cf.ui.convert_to_versioned_file')),
+          convert_custom_field_to_versioned_file_path(custom_field),
+          method: :post,
+          class: 'button icon icon-reload versioned-file-cf-conversion-button'
+        ) %>
+  <% else %>
+    <%= link_to(
+          sprite_icon('reload', l('versioned_file_cf.ui.convert_to_file')),
+          convert_custom_field_to_file_path(custom_field),
+          method: :post,
+          data: { confirm: l('versioned_file_cf.ui.confirm_convert_to_file') },
+          class: 'button icon icon-reload versioned-file-cf-conversion-button'
+        ) %>
+  <% end %>
+</p>
+
+<% if custom_field.field_format == 'versioned_file' %>
+  <p class="versioned-file-cf-conversion-warning">
+    <label></label>
+    <em class="info"><%= l('versioned_file_cf.ui.revert_warning') %></em>
+  </p>
+<% end %>

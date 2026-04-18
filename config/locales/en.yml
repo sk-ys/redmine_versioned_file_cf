@@ -3,6 +3,13 @@ en:
   versioned_file_cf:
     error_versioned_file_not_text: Only text files can be uploaded to this custom field.
     error_versioned_file_unchanged: The file content is unchanged.
+    ui:
+      conversion_title: Convert field format
+      convert_to_versioned_file: Convert to Versioned file format
+      convert_to_file: Convert to File format
+      confirm_convert_to_file: Convert this Versioned file format to File format? All revision history will be deleted.
+      revert_warning: Converting from Versioned file format to File format deletes all revision history.
+      remaining_invalid_values: "  ...and %{count} more"
     tasks:
       common:
         label_start: "Checking custom field id=%{id} (%{name})... total values=%{total}, values with attachments=%{filled}"

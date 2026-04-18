@@ -3,6 +3,13 @@ ja:
   versioned_file_cf:
     error_versioned_file_not_text: このカスタムフィールドにはテキストファイルのみアップロードできます。
     error_versioned_file_unchanged: 内容が同一です。
+    ui:
+      conversion_title: フィールド形式の変換
+      convert_to_versioned_file: ファイル（リビジョン管理）形式に変換
+      convert_to_file: ファイル形式に変換
+      confirm_convert_to_file: ファイル（リビジョン管理）形式からファイル形式に変換します。すべての履歴は削除されます。続行しますか？
+      revert_warning: ファイル（リビジョン管理）形式からファイル形式に変換すると、すべての履歴が削除されます。
+      remaining_invalid_values: "  ...ほか %{count} 件"
     tasks:
       common:
         label_start: "カスタムフィールド id=%{id}（%{name}）を確認しています... 全値=%{total} 件、添付あり=%{filled} 件"

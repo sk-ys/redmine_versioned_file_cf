@@ -1,0 +1,24 @@
+p.versioned-file-cf-conversion-field {
+  margin-top: 0.5rem;
+}
+
+.versioned-file-cf-conversion-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #b9c2cf;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f4f8 100%);
+  color: #2a2a2a;
+  text-decoration: none;
+}
+
+.versioned-file-cf-conversion-button:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #e6edf5 100%);
+  text-decoration: none;
+}
+
+.versioned-file-cf-conversion-button .icon {
+  margin-right: 0;
+}

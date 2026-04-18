@@ -49,6 +49,15 @@ Restart Redmine.
 4. Upload a text file from the edit screen of each object.
 5. A history list and diff links are shown at the bottom of the details page.
 
+### Converting Existing Custom Fields from the UI
+
+On the custom field edit screen, this plugin adds a conversion button only for `File` and `File (revision-managed)` formats.
+
+- `File` -> `File (revision-managed)`: converts the existing file custom field to the revision-managed format.
+- `File (revision-managed)` -> `File`: converts the field back to the normal file format.
+
+When converting from `File (revision-managed)` to `File`, all revision history stored in `vfcf_file_revisions` is deleted. The current file is kept as the normal file custom field attachment.
+
 ## Testing
 
 Prepare the test database from your Redmine root directory:
