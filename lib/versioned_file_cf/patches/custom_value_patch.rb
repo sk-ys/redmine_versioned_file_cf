@@ -3,10 +3,11 @@
 module VersionedFileCf
   module Patches
     module CustomValuePatch
-      extend ActiveSupport::Concern
-
-      included do
-        before_destroy :destroy_versioned_files
+      def destroy
+        self.class.transaction do
+          destroy_versioned_files
+          super
+        end
       end
 
       private

@@ -3,20 +3,13 @@
 module VersionedFileCf
   module Patches
     module ApplicationHelperPatch
-      extend ActiveSupport::Concern
-
-      included do
-        alias_method :link_to_attachment_container_without_versioned_file, :link_to_attachment_container
-        alias_method :link_to_attachment_container, :link_to_attachment_container_with_versioned_file
-      end
-
       BREADCRUMB_SEPARATOR = ' &raquo; '.html_safe
 
-      def link_to_attachment_container_with_versioned_file(attachment_container)
+      def link_to_attachment_container(attachment_container)
         breadcrumb = versioned_file_attachment_breadcrumb(attachment_container)
         return breadcrumb if breadcrumb
 
-        link_to_attachment_container_without_versioned_file(attachment_container)
+        super
       end
 
       private

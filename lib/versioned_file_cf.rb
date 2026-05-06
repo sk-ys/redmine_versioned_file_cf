@@ -14,7 +14,7 @@ require_relative 'versioned_file_cf/patches/custom_value_patch'
 module VersionedFileCf
   def self.setup!
     unless ApplicationHelper.ancestors.include?(VersionedFileCf::Patches::ApplicationHelperPatch)
-      ApplicationHelper.send(:include, VersionedFileCf::Patches::ApplicationHelperPatch)
+      ApplicationHelper.prepend(VersionedFileCf::Patches::ApplicationHelperPatch)
     end
 
     if defined?(IssuesHelper) && !IssuesHelper.ancestors.include?(VersionedFileCf::Patches::IssuesHelperPatch)
@@ -22,11 +22,11 @@ module VersionedFileCf
     end
 
     unless CustomValue.ancestors.include?(VersionedFileCf::Patches::CustomValuePatch)
-      CustomValue.send(:include, VersionedFileCf::Patches::CustomValuePatch)
+      CustomValue.prepend(VersionedFileCf::Patches::CustomValuePatch)
     end
 
     unless CustomField.ancestors.include?(VersionedFileCf::Patches::CustomFieldPatch)
-      CustomField.send(:include, VersionedFileCf::Patches::CustomFieldPatch)
+      CustomField.prepend(VersionedFileCf::Patches::CustomFieldPatch)
     end
 
     if defined?(Redmine::Acts::Customizable::InstanceMethods) &&

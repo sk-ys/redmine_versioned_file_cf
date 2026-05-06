@@ -3,10 +3,11 @@
 module VersionedFileCf
   module Patches
     module CustomFieldPatch
-      extend ActiveSupport::Concern
-
-      included do
-        before_destroy :destroy_versioned_files_for_field
+      def destroy
+        self.class.transaction do
+          destroy_versioned_files_for_field
+          super
+        end
       end
 
       private
