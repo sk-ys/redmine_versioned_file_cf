@@ -111,7 +111,7 @@ module VersionedFileCf
       payload = {
         action: :noop,
         attachment: nil,
-        content: '',
+        content: nil,
         value: '',
         error: nil,
         attachment_present: false
