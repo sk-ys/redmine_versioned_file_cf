@@ -37,4 +37,27 @@ class VersionedFileCfFieldFormatTest < ActiveSupport::TestCase
     assert_equal User.find(1), revision.author
     assert_equal revision.attachment.id.to_s, @custom_value.value
   end
+
+  def test_set_custom_field_value_marks_identical_upload_as_unchanged_by_digest
+    @custom_value.value = @format.set_custom_field_value(
+      @custom_field,
+      @custom_value,
+      { file: uploaded_test_file('testfile.txt', 'text/plain') }
+    )
+    @format.after_save_custom_value(@custom_field, @custom_value)
+
+    current_attachment = Attachment.find(@custom_value.value)
+
+    assert_no_difference 'Attachment.count' do
+      @custom_value.value = @format.set_custom_field_value(
+        @custom_field,
+        @custom_value,
+        { file: uploaded_test_file('testfile.txt', 'text/plain') }
+      )
+    end
+
+    assert_equal current_attachment.id.to_s, @custom_value.value
+    assert_includes @format.validate_custom_value(@custom_value),
+                    I18n.t(:error_versioned_file_unchanged, scope: :versioned_file_cf)
+  end
 end
