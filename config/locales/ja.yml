@@ -1,7 +1,6 @@
 ja:
   label_versioned_file: ファイル（リビジョン管理）
   versioned_file_cf:
-    error_versioned_file_not_text: このカスタムフィールドにはテキストファイルのみアップロードできます。
     error_versioned_file_unchanged: 内容が同一です。
     ui:
       conversion_title: フィールド形式の変換

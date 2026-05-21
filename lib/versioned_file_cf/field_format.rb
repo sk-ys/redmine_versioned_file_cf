@@ -185,13 +185,12 @@ module VersionedFileCf
       payload[:attachment] = attachment
       payload[:value] = attachment.id.to_s
 
-      unless attachment.readable? && attachment.is_text?
-        payload[:error] = ::I18n.t(:error_versioned_file_not_text, scope: :versioned_file_cf)
-        return payload
+      payload[:action] = :upload
+
+      if attachment.readable? && attachment.is_text?
+        payload[:content] = read_text(attachment)
       end
 
-      payload[:action] = :upload
-      payload[:content] = read_text(attachment)
       payload
     end
 
