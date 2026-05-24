@@ -172,7 +172,9 @@ module VersionedFileCf
       payload[:action] = :keep
       payload[:attachment] = attachment
       payload[:value] = attachment.id.to_s
-      payload[:content] = attachment.container&.content.to_s if attachment.container.is_a?(::VersionedFileCf::FileRevision)
+      if attachment.container.is_a?(::VersionedFileCf::FileRevision) && attachment.readable? && attachment.is_text?
+        payload[:content] = attachment.container&.content.to_s
+      end
       payload
     end
 
