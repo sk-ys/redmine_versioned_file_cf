@@ -196,8 +196,12 @@ module VersionedFileCf
 
     def discard_unchanged_upload!(custom_field_value, payload)
       return payload unless payload[:action] == :upload && payload[:attachment]
-      # return payload unless FileUtils.compare_file(payload[:attachment].diskfile, current_attachment_for(custom_field_value)&.diskfile)
-      return payload unless payload[:attachment].digest == current_attachment_for(custom_field_value)&.digest
+      return payload unless Setting.plugin_redmine_versioned_file_cf['compare_attachments_when_uploading'] != '0'
+      if Setting.plugin_redmine_versioned_file_cf['compare_attachments_by_hash'] != '0'
+        return payload unless payload[:attachment].digest == current_attachment_for(custom_field_value)&.digest
+      else
+        return payload unless FileUtils.compare_file(payload[:attachment].diskfile, current_attachment_for(custom_field_value)&.diskfile)
+      end
       return payload unless payload[:attachment].filename.to_s == current_filename_for(custom_field_value)
 
       payload[:attachment].destroy

@@ -1,0 +1,11 @@
+<p>
+  <%= label_tag 'settings[compare_attachments_when_uploading]', l(:label_compare_attachments_when_uploading, scope: :versioned_file_cf) %>
+  <input type="hidden" name="settings[compare_attachments_when_uploading]" value="0" />
+  <%= check_box_tag 'settings[compare_attachments_when_uploading]', '1', @settings['compare_attachments_when_uploading'] != '0' %>
+</p>
+<p>
+  <%= label_tag 'settings[compare_attachments_by_hash]', l(:label_compare_attachments_by_hash, scope: :versioned_file_cf) %>
+  <input type="hidden" name="settings[compare_attachments_by_hash]" value="0" />
+  <%= check_box_tag 'settings[compare_attachments_by_hash]', '1', @settings['compare_attachments_by_hash'] != '0' %>
+  <small><%= l(:description_compare_attachments_by_hash, scope: :versioned_file_cf) %></small>
+</p>

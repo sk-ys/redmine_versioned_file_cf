@@ -2,6 +2,9 @@ ja:
   label_versioned_file: ファイル（リビジョン管理）
   versioned_file_cf:
     error_versioned_file_unchanged: 内容が同一です。
+    label_compare_attachments_when_uploading: アップロード時に添付ファイルを比較
+    label_compare_attachments_by_hash: ハッシュ値で添付ファイルを比較
+    description_compare_attachments_by_hash: ハッシュ値で比較しない場合、ファイルの内容を直接比較します（速度が遅くなる可能性があります）。
     ui:
       conversion_title: フィールド形式の変換
       convert_to_versioned_file: ファイル（リビジョン管理）形式に変換
