@@ -198,9 +198,6 @@ module VersionedFileCf
       return payload unless payload[:action] == :upload && payload[:attachment]
       # return payload unless FileUtils.compare_file(payload[:attachment].diskfile, current_attachment_for(custom_field_value)&.diskfile)
       return payload unless payload[:attachment].digest == current_attachment_for(custom_field_value)&.digest
-      if payload[:content].present? && current_content_for(custom_field_value).present?
-        return payload unless payload[:content] == current_content_for(custom_field_value)
-      end
       return payload unless payload[:attachment].filename.to_s == current_filename_for(custom_field_value)
 
       payload[:attachment].destroy
