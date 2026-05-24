@@ -111,7 +111,7 @@ module VersionedFileCf
       payload = {
         action: :noop,
         attachment: nil,
-        content: '',
+        content: nil,
         value: '',
         error: nil,
         attachment_present: false
@@ -172,7 +172,9 @@ module VersionedFileCf
       payload[:action] = :keep
       payload[:attachment] = attachment
       payload[:value] = attachment.id.to_s
-      payload[:content] = attachment.container&.content.to_s if attachment.container.is_a?(::VersionedFileCf::FileRevision)
+      if attachment.container.is_a?(::VersionedFileCf::FileRevision) && attachment.readable? && attachment.is_text?
+        payload[:content] = attachment.container&.content.to_s
+      end
       payload
     end
 
@@ -185,19 +187,23 @@ module VersionedFileCf
       payload[:attachment] = attachment
       payload[:value] = attachment.id.to_s
 
-      unless attachment.readable? && attachment.is_text?
-        payload[:error] = ::I18n.t(:error_versioned_file_not_text, scope: :versioned_file_cf)
-        return payload
+      payload[:action] = :upload
+
+      if attachment.readable? && attachment.is_text?
+        payload[:content] = read_text(attachment)
       end
 
-      payload[:action] = :upload
-      payload[:content] = read_text(attachment)
       payload
     end
 
     def discard_unchanged_upload!(custom_field_value, payload)
       return payload unless payload[:action] == :upload && payload[:attachment]
-      return payload unless payload[:content] == current_content_for(custom_field_value)
+      return payload unless Setting.plugin_redmine_versioned_file_cf['compare_attachments_when_uploading'] != '0'
+      if Setting.plugin_redmine_versioned_file_cf['compare_attachments_by_hash'] != '0'
+        return payload unless payload[:attachment].digest == current_attachment_for(custom_field_value)&.digest
+      else
+        return payload unless FileUtils.compare_file(payload[:attachment].diskfile, current_attachment_for(custom_field_value)&.diskfile)
+      end
       return payload unless payload[:attachment].filename.to_s == current_filename_for(custom_field_value)
 
       payload[:attachment].destroy
@@ -246,7 +252,7 @@ module VersionedFileCf
       return current_revision.content.to_s if current_revision
 
       attachment = attachment_from_value(current_custom_value&.value)
-      return '' unless attachment&.readable? && attachment.is_text?
+      return nil unless attachment&.readable? && attachment.is_text?
 
       read_text(attachment)
     end

@@ -15,7 +15,7 @@ Japanese version: [README.ja.md](README.ja.md)
 
 ### Notes
 
-- This plugin assumes uploaded files are text files
+- If the uploaded file is not a text file, diffs cannot be displayed.
 - If Git is not available on the server, the standard Redmine file diff feature is used; if Git is available, the result of `git diff --no-index` is displayed.
 - Git is required on the server to download diff files.
 

@@ -8,6 +8,11 @@ Redmine::Plugin.register :redmine_versioned_file_cf do
   description 'Adds a revision-managed text file custom field.'
   version '0.2.1'
   requires_redmine version_or_higher: '6.1'
+  settings default: {
+    compare_attachments_when_uploading: '1',
+    compare_attachments_by_hash: '1',
+  },
+  partial: 'settings/versioned_file_cf_settings'
 end
 
 VersionedFileCf.setup!
