@@ -22,6 +22,7 @@
         <th><%= l(:field_updated_on) %></th>
         <th><%= l(:field_author) %></th>
         <th><%= l(:field_filename) %></th>
+        <th><%= l(:field_text) %></th>
         <th></th>
       </tr>
     </thead>
@@ -35,6 +36,9 @@
           <td class="updated_on"><%= format_time(revision.created_at) %></td>
           <td class="author"><%= link_to_user revision.author %></td>
           <td class="filename"><%= link_to_attachment revision.attachment %></td>
+          <td class="is_text">
+            <%= checked_image  revision.attachment.readable? && revision.attachment.is_text? %>
+          </td>
           <td class="buttons">
             <%= link_to l(:button_download), download_named_attachment_path(revision.attachment, revision.attachment.filename) %>
           </td>
