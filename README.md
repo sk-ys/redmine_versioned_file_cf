@@ -94,7 +94,7 @@ bundle exec rake versioned_file_cf:migrate_file_custom_field ID=12 DRY_RUN=1 RAI
 
 #### Notes
 - The migration task only targets custom fields whose format is the existing File custom field.
-- If the existing File custom field contains any non-text files or inconsistent attachments, the migration is aborted without applying changes.
+- If the existing File custom field has inconsistent attachments, the migration is aborted without making any changes.
 
 ### Convert Versioned file to File
 
