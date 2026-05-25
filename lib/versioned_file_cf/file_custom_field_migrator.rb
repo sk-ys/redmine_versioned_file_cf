@@ -119,14 +119,7 @@ module VersionedFileCf
           I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_not_owned')
         )
       end
-
-      return { status: :migratable } if attachment.readable? && attachment.is_text?
-
-      invalid_result(
-        custom_value,
-        attachment.id,
-        I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_not_text')
-      )
+      return { status: :migratable }
     end
 
     def already_migrated_value?(custom_value, active_revision)
@@ -146,7 +139,7 @@ module VersionedFileCf
         attachment: attachment,
         author: attachment.author,
         filename: attachment.filename,
-        content: read_text(attachment),
+        content: attachment.readable? && attachment.is_text? ? read_text(attachment) : nil,
         revision_number: 1,
         active: true,
         created_at: timestamp,

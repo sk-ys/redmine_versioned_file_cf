@@ -34,7 +34,6 @@ ja:
         reason_attachment_id_invalid: カスタムフィールド値に有効な添付ファイル ID が入っていません。
         reason_attachment_missing: 添付ファイルが見つかりません。
         reason_attachment_not_owned: 添付ファイルがこのカスタムフィールドに紐付いていません。
-        reason_attachment_not_text: テキスト添付ファイルのみ移行できます。
         reason_already_migrated: このカスタムフィールドには既にリビジョンがあります。
       revert_file_custom_field:
         label_dry_run: "ドライラン完了: %{count} 件のリビジョンを削除予定です。"
