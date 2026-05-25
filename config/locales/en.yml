@@ -34,7 +34,6 @@ en:
         reason_attachment_id_invalid: The value does not contain a valid attachment id.
         reason_attachment_missing: The attachment could not be found.
         reason_attachment_not_owned: The attachment is not associated with this custom value.
-        reason_attachment_not_text: Only text attachments can be migrated.
         reason_already_migrated: A revision already exists for this custom value.
       revert_file_custom_field:
         label_dry_run: "Dry run completed. %{count} revision records would be deleted."

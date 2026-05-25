@@ -51,24 +51,29 @@ class VersionedFileCfFileCustomFieldMigratorTest < ActiveSupport::TestCase
     assert_equal 'attachment', custom_field.reload.field_format
   end
 
-  def test_call_reports_invalid_values_for_binary_attachment
+  def test_call_migrates_binary_attachment_without_text_content
     custom_field = create_issue_attachment_custom_field
     custom_value = create_custom_value(issue: @issue, custom_field: custom_field)
-    create_attachment_for_custom_value(
+    attachment = create_attachment_for_custom_value(
       custom_value: custom_value,
       fixture: '2006/07/060719210727_archive.zip',
       mime_type: 'application/zip'
     )
 
-    assert_no_difference ['VersionedFileCf::FileRevision.count'] do
+    assert_difference ['VersionedFileCf::FileRevision.count'], +1 do
       result = VersionedFileCf::FileCustomFieldMigrator.new(custom_field_id: custom_field.id).call
 
-      assert_not result.success?
-      assert_equal 1, result.invalid_values.size
-      assert_equal I18n.t('versioned_file_cf.tasks.migrate_file_custom_field.reason_attachment_not_text'), result.invalid_values.first.reason
+      assert_predicate result, :success?
+      assert_equal 1, result.migrated_values_count
+      assert_empty result.invalid_values
     end
 
-    assert_equal 'attachment', custom_field.reload.field_format
+    assert_equal 'versioned_file', custom_field.reload.field_format
+
+    revision = VersionedFileCf::FileRevision.find_by!(custom_value_id: custom_value.id)
+    assert_equal attachment.id, revision.attachment_id
+    assert_nil revision.content
+    assert_equal revision, attachment.reload.container
   end
 
   def test_call_completes_when_value_is_already_migrated
