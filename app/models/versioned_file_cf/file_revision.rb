@@ -56,6 +56,11 @@ module VersionedFileCf
       attachments_editable?(user)
     end
 
+    def update_description(new_description)
+      attachment.description = new_description
+      attachment.save
+    end
+
     private
 
     def destroy_attachment

@@ -51,6 +51,14 @@ class VersionedFilesController < ApplicationController
     return if performed?
     return send_diff_data if diff_download_request?
   end
+  
+  def update_description
+    @revision = VersionedFileCf::FileRevision.find(params[:id])
+    @revision.update_description(params[:description])
+    render json: { success: true }
+  rescue ActiveRecord::RecordNotFound
+    render json: { success: false }, status: :not_found
+  end
 
   private
 

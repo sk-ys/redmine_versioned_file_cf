@@ -1,3 +1,59 @@
+<% content_for :header_tags do %>
+  <style>
+    .wiki-page-versions .description {
+      div {
+        display: flex;
+        gap: 5px;
+        
+        input {
+          flex: 1 0 auto;
+          border-width: 0;
+          &:active, &:focus {
+            outline: none;
+            border-width: 1px;
+            
+            &+button {
+              display: inline-block;
+            }
+          }
+        }
+        button {
+          flex: 0 0 auto;
+          cursor: pointer;
+          display: none;
+          
+          &:active, &:focus, &:hover {
+              display: inline-block;
+            }
+        }
+      }
+    }
+  </style>
+  <script>
+    function updateDescription(button) {
+      const input = button.previousElementSibling;
+      const revisionId = button.closest('tr').dataset.revisionId;
+      const description = input.value;
+      fetch('<%= update_description_versioned_files_path %>', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': '<%= form_authenticity_token %>'
+        },
+        body: JSON.stringify({ id: revisionId, description: description })
+      }).then(response => {
+        if (response.ok) {
+          alert('<%= j l(:notice_successful_update) %>');
+        } else {
+          alert('<%= j l(:error_occurred) %>');
+        }
+      }).catch(() => {
+        alert('<%= j l(:error_occurred) %>');
+      });
+    }
+  </script>
+<% end %>
+
 <h2>
   <%= safe_join([
     link_to_record(@custom_value.customized),
@@ -23,13 +79,14 @@
         <th><%= l(:field_author) %></th>
         <th><%= l(:field_filename) %></th>
         <th><%= l(:field_text) %></th>
+        <th><%= l(:field_description) %></th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       <% line_num = 1 %>
       <% @revisions.each do |revision| %>
-        <tr class="wiki-page-version">
+        <tr class="wiki-page-version" data-revision-id="<%= revision.id %>" data-attachment-id="<%= revision.attachment.id %>">
           <td class="id">r<%= revision.revision_number %></td>
           <td class="checkbox"><%= radio_button_tag('revision_id', revision.id, (line_num == 1), id: "cb-#{line_num}", onclick: "$('#cbto-#{line_num + 1}').prop('checked', true);") if show_diff && (line_num < @revisions.size) %></td>
           <td class="checkbox"><%= radio_button_tag('compare_to_id', revision.id, (line_num == 2), id: "cbto-#{line_num}") if show_diff && (line_num > 1) %></td>
@@ -38,6 +95,12 @@
           <td class="filename"><%= link_to_attachment revision.attachment %></td>
           <td class="is_text">
             <%= checked_image  revision.attachment.readable? && revision.attachment.is_text? %>
+          </td>
+          <td class="description">
+            <div>
+              <input type="text" value="<%= h(revision.attachment.description) %>">
+              <button class="update-description" type="button" onclick="updateDescription(this)"><%= l(:button_update) %></button>
+            </div>
           </td>
           <td class="buttons">
             <%= link_to l(:button_download), download_named_attachment_path(revision.attachment, revision.attachment.filename) %>
