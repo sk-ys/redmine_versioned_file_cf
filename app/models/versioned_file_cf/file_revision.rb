@@ -57,8 +57,7 @@ module VersionedFileCf
     end
 
     def update_description(new_description)
-      attachment.description = new_description
-      attachment.save
+      attachment.update(description: new_description.to_s)
     end
 
     private

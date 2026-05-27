@@ -15,6 +15,8 @@ Redmine::Plugin.register :redmine_versioned_file_cf do
     compare_attachments_by_hash: '1',
   },
   partial: 'settings/versioned_file_cf_settings'
+
+  permission :update_versioned_file_description, { versioned_files: [:update_description] }
 end
 
 VersionedFileCf.setup!

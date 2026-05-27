@@ -8,7 +8,7 @@ class VersionedFilesController < ApplicationController
   DIFF_TYPES = %w[inline sbs].freeze
   GIT_NO_INDEX_ARGS = %w[diff --no-index --no-color --text --].freeze
 
-  before_action :find_revision, only: [:diff]
+  before_action :find_revision, only: [:diff, :update_description]
   before_action :find_custom_value, only: [:history, :compare]
 
   helper :issues
@@ -21,6 +21,7 @@ class VersionedFilesController < ApplicationController
       limit(@version_pages.per_page + 1).
       offset(@version_pages.offset).
       to_a
+    @can_update_attachment_description = @revisions.any? && can_update_attachment_description?(@revisions.first)
   end
 
   def compare
@@ -51,11 +52,15 @@ class VersionedFilesController < ApplicationController
     return if performed?
     return send_diff_data if diff_download_request?
   end
-  
+
   def update_description
-    @revision = VersionedFileCf::FileRevision.find(params[:id])
-    @revision.update_description(params[:description])
-    render json: { success: true }
+    return deny_access unless can_update_attachment_description?(@revision)
+
+    if @revision.update_description(params[:description])
+      render json: { success: true }
+    else
+      render json: { success: false, errors: @revision.attachment.errors.full_messages }, status: :unprocessable_entity
+    end
   rescue ActiveRecord::RecordNotFound
     render json: { success: false }, status: :not_found
   end
@@ -115,6 +120,17 @@ class VersionedFilesController < ApplicationController
     @revision = VersionedFileCf::FileRevision.includes(:custom_value, :attachment, :author).find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+
+  def can_update_attachment_description?(revision)
+    return false unless revision&.visible?(User.current)
+    return true if User.current.admin?
+    return false unless revision.attachments_editable?(User.current)
+
+    project = revision.project
+    return false unless project
+
+    User.current.allowed_to?(:update_versioned_file_description, project)
   end
 
   def text_to_lines(text)

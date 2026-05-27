@@ -98,8 +98,12 @@
           </td>
           <td class="description">
             <div>
-              <input type="text" value="<%= h(revision.attachment.description) %>">
-              <button class="update-description" type="button" onclick="updateDescription(this)"><%= l(:button_update) %></button>
+              <% if @can_update_attachment_description %>
+                <input type="text" value="<%= h(revision.attachment.description) %>">
+                <button class="update-description" type="button" onclick="updateDescription(this)"><%= l(:button_update) %></button>
+              <% else %>
+                <%= h(revision.attachment.description) %>
+              <% end %>
             </div>
           </td>
           <td class="buttons">
