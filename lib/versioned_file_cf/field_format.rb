@@ -91,7 +91,7 @@ module VersionedFileCf
       payload = VersionedFileCf.pending_revision_for(custom_value.customized, custom_value.custom_field_id)
       attachment ||= payload[:attachment] if payload&.dig(:action) == :upload
 
-      view.hidden_field_tag("#{tag_name}[blank]", '') +
+      view.hidden_field_tag("#{tag_name}[blank]", '', class: 'versioned-file-cf-form') +
         view.render(
           partial: 'attachments/form',
           locals: {
