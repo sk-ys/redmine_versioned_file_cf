@@ -61,8 +61,6 @@ class VersionedFilesController < ApplicationController
     else
       render json: { success: false, errors: @revision.attachment.errors.full_messages }, status: :unprocessable_entity
     end
-  rescue ActiveRecord::RecordNotFound
-    render json: { success: false }, status: :not_found
   end
 
   private
