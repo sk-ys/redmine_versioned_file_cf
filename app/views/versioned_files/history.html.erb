@@ -45,10 +45,10 @@
         if (response.ok) {
           alert('<%= j l(:notice_successful_update) %>');
         } else {
-          alert('<%= j l(:error_occurred) %>');
+          alert('<%= j l(:notice_failed_update, scope: :versioned_files) %>');
         }
       }).catch(() => {
-        alert('<%= j l(:error_occurred) %>');
+        alert('<%= j l(:notice_failed_update, scope: :versioned_files) %>');
       });
     }
   </script>

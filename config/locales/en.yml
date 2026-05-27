@@ -5,6 +5,7 @@ en:
     label_compare_attachments_when_uploading: Compare attachments when uploading
     label_compare_attachments_by_hash: Compare attachments by hash
     description_compare_attachments_by_hash: If not comparing by hash, the file contents will be compared directly (which may be slower).
+    notice_failed_update: Failed to update.
     ui:
       conversion_title: Convert field format
       convert_to_versioned_file: Convert to Versioned file format
