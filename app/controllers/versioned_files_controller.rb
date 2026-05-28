@@ -10,6 +10,7 @@ class VersionedFilesController < ApplicationController
 
   before_action :find_revision, only: [:diff, :update_description]
   before_action :find_custom_value, only: [:history, :compare]
+  before_action :authorize
 
   helper :issues
   helper :attachments
@@ -116,19 +117,16 @@ class VersionedFilesController < ApplicationController
 
   def find_revision
     @revision = VersionedFileCf::FileRevision.includes(:custom_value, :attachment, :author).find(params[:id])
+    @project = @revision.project
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def can_update_attachment_description?(revision)
     return false unless revision&.visible?(User.current)
-    return true if User.current.admin?
     return false unless revision.attachments_editable?(User.current)
 
-    project = revision.project
-    return false unless project
-
-    User.current.allowed_to?(:update_versioned_file_description, project)
+    User.current.allowed_to?(:update_versioned_file_description, @project)
   end
 
   def text_to_lines(text)
