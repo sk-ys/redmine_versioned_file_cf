@@ -124,13 +124,9 @@ class VersionedFilesController < ApplicationController
 
   def can_update_attachment_description?(revision)
     return false unless revision&.visible?(User.current)
-    return true if User.current.admin?
     return false unless revision.attachments_editable?(User.current)
 
-    project = revision.project
-    return false unless project
-
-    User.current.allowed_to?(:update_versioned_file_description, project)
+    User.current.allowed_to?(:update_versioned_file_description, @project)
   end
 
   def text_to_lines(text)
