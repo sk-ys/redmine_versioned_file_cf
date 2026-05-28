@@ -6,6 +6,7 @@ RedmineApp::Application.routes.draw do
     collection do
       get :history
       get :compare
+      post :update_description
     end
     member do
       get :diff

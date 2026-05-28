@@ -73,4 +73,22 @@ class VersionedFilesControllerTest < Redmine::ControllerTest
 
     assert_response :forbidden
   end
+
+  def test_update_description_updates_attachment_for_authorized_user
+    @request.session[:user_id] = 1
+
+    post(:update_description, params: { id: @revision.id, description: 'updated by admin' }, xhr: true)
+
+    assert_response :success
+    assert_equal 'updated by admin', @revision.attachment.reload.description
+  end
+
+  def test_update_description_denies_access_without_permission
+    @request.session[:user_id] = 2
+
+    post(:update_description, params: { id: @revision.id, description: 'should fail' }, xhr: true)
+
+    assert_response :forbidden
+    assert_not_equal 'should fail', @revision.attachment.reload.description
+  end
 end

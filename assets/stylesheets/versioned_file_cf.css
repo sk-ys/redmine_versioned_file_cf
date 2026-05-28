@@ -1,0 +1,7 @@
+#attributes .versioned-file-cf-form + .attachments_form {
+  input.description {
+    float: inline-start;
+    inline-size: 95%;
+    margin-inline-start: 0;
+  }
+}

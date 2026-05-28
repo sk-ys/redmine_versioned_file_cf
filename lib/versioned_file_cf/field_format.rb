@@ -91,13 +91,13 @@ module VersionedFileCf
       payload = VersionedFileCf.pending_revision_for(custom_value.customized, custom_value.custom_field_id)
       attachment ||= payload[:attachment] if payload&.dig(:action) == :upload
 
-      view.hidden_field_tag("#{tag_name}[blank]", '') +
+      view.hidden_field_tag("#{tag_name}[blank]", '', class: 'versioned-file-cf-form') +
         view.render(
           partial: 'attachments/form',
           locals: {
             attachment_param: tag_name,
             multiple: false,
-            description: false,
+            description: true,
             saved_attachments: [attachment].compact,
             filedrop: true,
             attachment_format_custom_field: true
@@ -112,6 +112,7 @@ module VersionedFileCf
         action: :noop,
         attachment: nil,
         content: nil,
+        description: nil,
         value: '',
         error: nil,
         attachment_present: false
@@ -125,20 +126,25 @@ module VersionedFileCf
           value = normalize_hash(value.values.first)
         end
 
+        attachment_attributes = extract_attachment_attributes(value)
+
         if value['id'].present? || value[:id].present?
           payload[:attachment_present] = true
           attachment = find_existing_attachment(custom_field_value, value['id'] || value[:id])
           set_payload_from_existing_attachment(payload, attachment)
+          apply_attachment_attributes!(payload, attachment, attachment_attributes)
         elsif value['token'].present? || value[:token].present?
           payload[:attachment_present] = true
           attachment = Attachment.find_by_token(value['token'] || value[:token])
           build_payload_from_attachment(payload, attachment)
+          apply_attachment_attributes!(payload, attachment, attachment_attributes)
           discard_unchanged_upload!(custom_field_value, payload)
         elsif value.key?('file') || value.key?(:file)
           payload[:attachment_present] = true
           attachment = Attachment.new(file: value['file'] || value[:file], author: User.current)
           if attachment.save
             build_payload_from_attachment(payload, attachment)
+            apply_attachment_attributes!(payload, attachment, attachment_attributes)
             discard_unchanged_upload!(custom_field_value, payload)
           else
             payload[:error] = ::I18n.t('activerecord.errors.messages.invalid')
@@ -172,6 +178,7 @@ module VersionedFileCf
       payload[:action] = :keep
       payload[:attachment] = attachment
       payload[:value] = attachment.id.to_s
+      payload[:description] = attachment.description.to_s
       if attachment.container.is_a?(::VersionedFileCf::FileRevision) && attachment.readable? && attachment.is_text?
         payload[:content] = attachment.container&.content.to_s
       end
@@ -186,6 +193,7 @@ module VersionedFileCf
 
       payload[:attachment] = attachment
       payload[:value] = attachment.id.to_s
+      payload[:description] = attachment.description.to_s
 
       payload[:action] = :upload
 
@@ -205,12 +213,38 @@ module VersionedFileCf
         return payload unless FileUtils.compare_file(payload[:attachment].diskfile, current_attachment_for(custom_field_value)&.diskfile)
       end
       return payload unless payload[:attachment].filename.to_s == current_filename_for(custom_field_value)
+      return payload unless payload[:attachment].description.to_s == current_description_for(custom_field_value)
 
       payload[:attachment].destroy
       payload[:action] = :keep
       payload[:attachment] = current_attachment_for(custom_field_value)
       payload[:value] = payload[:attachment]&.id.to_s
+      payload[:description] = payload[:attachment]&.description.to_s
       payload[:error] = ::I18n.t(:error_versioned_file_unchanged, scope: :versioned_file_cf)
+      payload
+    end
+
+    def extract_attachment_attributes(value)
+      attributes = {}
+      if value.key?('filename') || value.key?(:filename)
+        attributes[:filename] = value['filename'] || value[:filename]
+      end
+      if value.key?('description') || value.key?(:description)
+        attributes[:description] = (value['description'] || value[:description]).to_s.strip
+      end
+      attributes
+    end
+
+    def apply_attachment_attributes!(payload, attachment, attributes)
+      return payload if payload[:error].present?
+      return payload if attachment.nil? || attributes.blank?
+
+      attachment.assign_attributes(attributes)
+      if attachment.save
+        payload[:description] = attachment.description.to_s
+      else
+        payload[:error] = ::I18n.t('activerecord.errors.messages.invalid')
+      end
       payload
     end
 
@@ -263,6 +297,14 @@ module VersionedFileCf
       return current_revision.filename.to_s if current_revision
 
       attachment_from_value(current_custom_value&.value)&.filename.to_s
+    end
+
+    def current_description_for(custom_field_value)
+      current_custom_value = custom_field_value.customized.custom_value_for(custom_field_value.custom_field)
+      current_revision = current_revision_for(current_custom_value)
+      return current_revision.attachment&.description.to_s if current_revision
+
+      attachment_from_value(current_custom_value&.value)&.description.to_s
     end
 
     def current_attachment_for(custom_field_value)
