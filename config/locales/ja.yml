@@ -6,6 +6,7 @@ ja:
     label_compare_attachments_by_hash: ハッシュ値で添付ファイルを比較
     description_compare_attachments_by_hash: ハッシュ値で比較しない場合、ファイルの内容を直接比較します（速度が遅くなる可能性があります）。
     notice_failed_update: 更新に失敗しました。
+    field_is_text: テキスト
     ui:
       conversion_title: フィールド形式の変換
       convert_to_versioned_file: ファイル（リビジョン管理）形式に変換
