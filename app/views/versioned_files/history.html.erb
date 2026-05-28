@@ -107,7 +107,11 @@
             </div>
           </td>
           <td class="buttons">
-            <%= link_to l(:button_download), download_named_attachment_path(revision.attachment, revision.attachment.filename) %>
+            <%= link_to\
+              sprite_icon('download', l(:button_download)),\
+              download_named_attachment_path(revision.attachment, revision.attachment.filename),\
+              title: l(:button_download),\
+              class: 'icon icon-download icon-only' %>
           </td>
         </tr>
         <% line_num += 1 %>
