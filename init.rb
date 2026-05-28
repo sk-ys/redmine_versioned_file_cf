@@ -16,6 +16,7 @@ Redmine::Plugin.register :redmine_versioned_file_cf do
   },
   partial: 'settings/versioned_file_cf_settings'
 
+  permission :view_versioned_file_revisions, { versioned_files: [:history, :compare, :diff] }
   permission :update_versioned_file_description, { versioned_files: [:update_description] }
 end
 

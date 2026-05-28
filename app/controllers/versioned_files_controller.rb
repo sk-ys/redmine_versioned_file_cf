@@ -10,6 +10,7 @@ class VersionedFilesController < ApplicationController
 
   before_action :find_revision, only: [:diff, :update_description]
   before_action :find_custom_value, only: [:history, :compare]
+  before_action :authorize
 
   helper :issues
   helper :attachments
@@ -116,6 +117,7 @@ class VersionedFilesController < ApplicationController
 
   def find_revision
     @revision = VersionedFileCf::FileRevision.includes(:custom_value, :attachment, :author).find(params[:id])
+    @project = @revision.project
   rescue ActiveRecord::RecordNotFound
     render_404
   end
