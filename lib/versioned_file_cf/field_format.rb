@@ -85,6 +85,8 @@ module VersionedFileCf
     end
 
     def edit_tag(view, tag_id, tag_name, custom_value, options = {})
+      append_header_stylesheet_once(view)
+
       persisted_custom_value = custom_value.customized.custom_value_for(custom_value.custom_field)
       revision = current_revision_for(persisted_custom_value)
       attachment = revision&.attachment || attachment_from_value(persisted_custom_value&.value || custom_value.value)
@@ -106,6 +108,15 @@ module VersionedFileCf
     end
 
     private
+
+    def append_header_stylesheet_once(view)
+      return if view.instance_variable_get(:@versioned_file_cf_header_stylesheet_appended)
+
+      view.instance_variable_set(:@versioned_file_cf_header_stylesheet_appended, true)
+      view.content_for(:header_tags) do
+        view.stylesheet_link_tag('versioned_file_cf', plugin: 'redmine_versioned_file_cf', media: 'all')
+      end
+    end
 
     def normalize_value(custom_field, custom_field_value, value)
       payload = {
