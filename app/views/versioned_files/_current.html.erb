@@ -2,8 +2,10 @@
   <div class="revision-file-current" style="display:flex; align-items: center; gap: 0.5em;">
     <%= link_to_attachment attachment %>
     <% if revision %>
-      <span class="revision-file-meta">(r<%= revision.revision_number %>)</span>
-      <%= link_to sprite_icon('history', l(:label_history)), history_versioned_files_path(custom_value_id: revision.custom_value_id), class: 'icon icon-history' %>
+      <%= link_to\
+        "(r#{revision.revision_number})",\
+        history_versioned_files_path(custom_value_id: revision.custom_value_id),\
+        class: 'revision-file-meta' %>
     <% end %>
   </div>
 <% elsif value.present? %>
