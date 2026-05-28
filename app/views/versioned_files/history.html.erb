@@ -80,7 +80,6 @@
         <th><%= l(:field_filename) %></th>
         <th><%= l(:field_is_text, scope: :versioned_file_cf) %></th>
         <th><%= l(:field_description) %></th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -92,7 +91,14 @@
           <td class="checkbox"><%= radio_button_tag('compare_to_id', revision.id, (line_num == 2), id: "cbto-#{line_num}") if show_diff && (line_num > 1) %></td>
           <td class="updated_on"><%= format_time(revision.created_at) %></td>
           <td class="author"><%= link_to_user revision.author %></td>
-          <td class="filename"><%= link_to_attachment revision.attachment %></td>
+          <td class="filename">
+            <%= link_to_attachment revision.attachment %>
+            <%= link_to\
+              sprite_icon('download', l(:button_download)),\
+              download_named_attachment_path(revision.attachment, revision.attachment.filename),\
+              title: l(:button_download),\
+              class: 'icon icon-download icon-only' %>
+          </td>
           <td class="is_text">
             <%= checked_image  revision.attachment.readable? && revision.attachment.is_text? %>
           </td>
@@ -105,13 +111,6 @@
                 <%= h(revision.attachment.description) %>
               <% end %>
             </div>
-          </td>
-          <td class="buttons">
-            <%= link_to\
-              sprite_icon('download', l(:button_download)),\
-              download_named_attachment_path(revision.attachment, revision.attachment.filename),\
-              title: l(:button_download),\
-              class: 'icon icon-download icon-only' %>
           </td>
         </tr>
         <% line_num += 1 %>
