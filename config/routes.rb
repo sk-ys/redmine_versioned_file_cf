@@ -10,6 +10,7 @@ RedmineApp::Application.routes.draw do
     end
     member do
       get :diff
+      post :restore
     end
   end
 end

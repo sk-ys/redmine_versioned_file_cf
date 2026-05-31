@@ -75,6 +75,15 @@
                   title: l(:button_delete),\
                   class: 'icon icon-del icon-only' %>
               <% end %>
+              <% if User.current.allowed_to?(:restore_file_revision, @project) %>
+                <%= link_to\
+                  sprite_icon('reload', l(:button_restore)),\
+                  restore_versioned_file_path(revision.id),\
+                  method: :post,\
+                  data: { confirm: l(:text_are_you_sure) },\
+                  title: l(:button_restore),\
+                  class: 'icon icon-reload icon-only' %>
+              <% end %>
               <%= link_to\
                 sprite_icon('download', l(:button_download)),\
                 download_named_attachment_path(revision.attachment, revision.attachment.filename),\

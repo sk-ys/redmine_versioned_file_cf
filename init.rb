@@ -19,6 +19,7 @@ Redmine::Plugin.register :redmine_versioned_file_cf do
   permission :view_versioned_file_revisions, { versioned_files: [:history, :compare, :diff] }
   permission :update_versioned_file_description, { versioned_files: [:update_description] }
   permission :remove_file_revision, { versioned_files: [:destroy] }
+  permission :restore_file_revision, { versioned_files: [:restore] }
 end
 
 VersionedFileCf.setup!

@@ -51,4 +51,33 @@ class VersionedFileCfFileRevisionTest < ActiveSupport::TestCase
     assert_not VersionedFileCf::FileRevision.exists?(revision.id)
     assert_not Attachment.exists?(revision.attachment_id)
   end
+
+  def test_destroy_keeps_attachment_when_referenced_by_another_revision
+    revision = create_revision(
+      custom_value: @custom_value,
+      fixture: 'testfile.txt',
+      content: "inactive revision\n",
+      revision_number: 1,
+      active: false
+    )
+    restored_revision = VersionedFileCf::FileRevision.create!(
+      custom_value: @custom_value,
+      attachment: revision.attachment,
+      author: User.find(1),
+      filename: revision.filename,
+      content: "restored revision\n",
+      revision_number: 2,
+      active: true
+    )
+
+    assert_difference('VersionedFileCf::FileRevision.count', -1) do
+      assert_no_difference('Attachment.count') do
+        assert revision.destroy
+      end
+    end
+
+    assert_not VersionedFileCf::FileRevision.exists?(revision.id)
+    assert VersionedFileCf::FileRevision.exists?(restored_revision.id)
+    assert Attachment.exists?(restored_revision.attachment_id)
+  end
 end

@@ -6,7 +6,11 @@ en:
     error_no_valid_revisions_selected_for_removal: No valid revisions selected for removal.
     error_revision_cannot_be_deleted: You are not allowed to delete this revision.
     error_failed_to_remove_revision: Failed to remove revision.
+    error_failed_to_restore_revision: Failed to restore revision.
+    error_issue_cannot_be_updated_for_restore: Issue cannot be updated to restore this revision.
     notice_revision_removed: Revision removed successfully.
+    notice_revision_restored: Restored as revision r%{revision}.
+    journal_restore_revision: Restored revision r%{revision}.
     label_compare_attachments_when_uploading: Compare attachments when uploading
     label_compare_attachments_by_hash: Compare attachments by hash
     description_compare_attachments_by_hash: If not comparing by hash, the file contents will be compared directly (which may be slower).

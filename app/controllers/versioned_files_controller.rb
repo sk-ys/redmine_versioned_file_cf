@@ -8,7 +8,7 @@ class VersionedFilesController < ApplicationController
   DIFF_TYPES = %w[inline sbs].freeze
   GIT_NO_INDEX_ARGS = %w[diff --no-index --no-color --text --].freeze
 
-  before_action :find_revision, only: [:diff, :update_description, :destroy]
+  before_action :find_revision, only: [:diff, :update_description, :destroy, :restore]
   before_action :find_custom_value, only: [:history, :compare]
   before_action :authorize
 
@@ -97,6 +97,57 @@ class VersionedFilesController < ApplicationController
     end
   end
 
+  def restore
+    assign_contexts_from_revision
+    return deny_access unless can_restore_revision?(@revision)
+
+    restored_revision = nil
+    custom_value = @revision.custom_value
+    issue = custom_value.customized if custom_value.customized.is_a?(Issue)
+
+    VersionedFileCf::FileRevision.transaction do
+      if issue
+        unless issue.editable?(User.current)
+          @restore_error_message = l(:error_issue_cannot_be_updated_for_restore, scope: :versioned_file_cf)
+          raise ActiveRecord::Rollback
+        end
+
+        issue.init_journal(User.current, l(:journal_restore_revision, scope: :versioned_file_cf, revision: @revision.revision_number))
+        unless issue.save
+          @restore_error_message = issue.errors.full_messages.to_sentence.presence ||
+                                   l(:error_issue_cannot_be_updated_for_restore, scope: :versioned_file_cf)
+          raise ActiveRecord::Rollback
+        end
+      end
+
+      revisions_scope_for_custom_value(custom_value).current.update_all(active: false)
+      next_revision_number = revisions_scope_for_custom_value(custom_value).maximum(:revision_number).to_i + 1
+      restored_revision = VersionedFileCf::FileRevision.new(
+        custom_value: custom_value,
+        attachment_id: @revision.attachment_id,
+        author: User.current,
+        filename: @revision.filename,
+        content: @revision.content,
+        revision_number: next_revision_number,
+        active: true
+      )
+      unless restored_revision.save
+        @restore_error_message = restored_revision.errors.full_messages.to_sentence.presence ||
+                                 l(:error_failed_to_restore_revision, scope: :versioned_file_cf)
+        raise ActiveRecord::Rollback
+      end
+
+      custom_value.update_columns(value: @revision.attachment_id.to_s)
+    end
+
+    if restored_revision
+      flash[:notice] = l(:notice_revision_restored, scope: :versioned_file_cf, revision: restored_revision.revision_number)
+    else
+      flash[:error] = @restore_error_message.presence || l(:error_failed_to_restore_revision, scope: :versioned_file_cf)
+    end
+    redirect_back_or_default history_versioned_files_path(custom_value_id: @custom_value.id)
+  end
+
   private
 
   def prepare_diff
@@ -162,6 +213,13 @@ class VersionedFilesController < ApplicationController
     User.current.allowed_to?(:update_versioned_file_description, @project)
   end
 
+  def can_restore_revision?(revision)
+    return false unless revision&.visible?(User.current)
+    return false unless revision.attachments_visible?(User.current)
+
+    User.current.allowed_to?(:restore_file_revision, @project)
+  end
+
   def respond_remove_revision_success(message)
     respond_to do |format|
       format.json { render json: { success: true, message: message } }
@@ -184,6 +242,10 @@ class VersionedFilesController < ApplicationController
 
   def text_to_lines(text)
     text.to_s.lines(chomp: true)
+  end
+
+  def revisions_scope_for_custom_value(custom_value)
+    VersionedFileCf::FileRevision.where(custom_value_id: custom_value.id)
   end
 
   def build_line_operations(previous_lines, current_lines)
