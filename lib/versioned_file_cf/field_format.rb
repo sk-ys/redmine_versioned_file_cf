@@ -13,6 +13,7 @@ module VersionedFileCf
     def formatted_custom_value(view, custom_value, html = false)
       persisted_custom_value = custom_value.customized.custom_value_for(custom_value.custom_field)
       revision = current_revision_for(persisted_custom_value)
+      latest_revision = latest_revision_for(persisted_custom_value)
       attachment = revision&.attachment || attachment_from_value(custom_value.value)
       display_value = attachment&.filename.to_s.presence || revision&.filename.to_s.presence || custom_value.value.to_s
       return display_value unless html
@@ -23,7 +24,8 @@ module VersionedFileCf
           custom_value: custom_value,
           revision: revision,
           attachment: attachment,
-          value: display_value
+          value: display_value,
+          latest_revision: latest_revision
         }
       )
     end
@@ -289,6 +291,10 @@ module VersionedFileCf
 
     def current_revision_for(custom_value)
       revisions_scope(custom_value).current.order(revision_number: :desc, id: :desc).first
+    end
+
+    def latest_revision_for(custom_value)
+      revisions_scope(custom_value).order(revision_number: :desc, id: :desc).first
     end
 
     def current_content_for(custom_field_value)
