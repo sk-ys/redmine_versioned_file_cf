@@ -52,6 +52,7 @@
   .filename-with-actions {
     display: inline-flex;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     gap: 5px;
 
@@ -63,6 +64,17 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    
+    .actions {
+      display: inline-flex;
+      gap: 5px;
+
+      .blank-action {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+      }
     }
   }
 }
