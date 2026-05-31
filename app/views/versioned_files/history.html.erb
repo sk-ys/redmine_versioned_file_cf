@@ -75,7 +75,7 @@
                   title: l(:button_delete),\
                   class: 'icon icon-del icon-only' %>
               <% end %>
-              <% if User.current.allowed_to?(:restore_file_revision, @project) %>
+              <% if User.current.allowed_to?(:restore_file_revision, @project) && !revision.active? %>
                 <%= link_to\
                   sprite_icon('cancel', l(:button_restore)),\
                   restore_versioned_file_path(revision.id),\

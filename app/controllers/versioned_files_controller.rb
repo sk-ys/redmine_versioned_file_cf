@@ -220,6 +220,7 @@ class VersionedFilesController < ApplicationController
   end
 
   def can_restore_revision?(revision)
+    return false if revision.nil? || revision.active?
     return false unless revision&.visible?(User.current)
     return false unless revision.attachments_visible?(User.current)
 
