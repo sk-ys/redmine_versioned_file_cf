@@ -77,12 +77,12 @@
               <% end %>
               <% if User.current.allowed_to?(:restore_file_revision, @project) %>
                 <%= link_to\
-                  sprite_icon('reload', l(:button_restore)),\
+                  sprite_icon('cancel', l(:button_restore)),\
                   restore_versioned_file_path(revision.id),\
                   method: :post,\
                   data: { confirm: l(:text_are_you_sure) },\
                   title: l(:button_restore),\
-                  class: 'icon icon-reload icon-only' %>
+                  class: 'icon icon-cancel icon-only' %>
               <% end %>
               <%= link_to\
                 sprite_icon('download', l(:button_download)),\
