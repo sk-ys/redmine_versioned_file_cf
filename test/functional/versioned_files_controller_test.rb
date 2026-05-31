@@ -128,4 +128,57 @@ class VersionedFilesControllerTest < Redmine::ControllerTest
     assert_response :forbidden
     assert VersionedFileCf::FileRevision.exists?(@previous_revision.id)
   end
+
+  def test_restore_creates_new_revision_for_authorized_user
+    @request.session[:user_id] = 1
+    old_attachment_id = @custom_value.value
+
+    assert_difference('VersionedFileCf::FileRevision.count', 1) do
+      assert_difference('Journal.count', 1) do
+        post(:restore, params: { id: @previous_revision.id })
+      end
+    end
+
+    restored_revision = VersionedFileCf::FileRevision.order(id: :desc).first
+    assert_equal @custom_value.id, restored_revision.custom_value_id
+    assert_equal @previous_revision.attachment_id, restored_revision.attachment_id
+    assert_equal 1, restored_revision.author_id
+    assert restored_revision.active?
+    assert_not @revision.reload.active?
+    assert_equal @previous_revision.attachment_id.to_s, @custom_value.reload.value
+    journal = @issue.journals.order(id: :desc).first
+    detail = journal.details.find_by(property: 'cf', prop_key: @custom_field.id.to_s)
+    assert_not_nil detail
+    assert_equal old_attachment_id, detail.old_value
+    assert_equal @previous_revision.attachment_id.to_s, detail.value
+    assert journal.notes.blank?
+    assert_redirected_to history_versioned_files_path(custom_value_id: @custom_value.id)
+    assert_equal I18n.t(:notice_revision_restored, scope: :versioned_file_cf, revision: restored_revision.revision_number), flash[:notice]
+  end
+
+  def test_restore_denies_access_without_permission
+    @request.session[:user_id] = 2
+
+    assert_no_difference('VersionedFileCf::FileRevision.count') do
+      post(:restore, params: { id: @previous_revision.id })
+    end
+
+    assert_response :forbidden
+  end
+
+  def test_restore_aborts_when_issue_is_invalid
+    @issue.update_column(:subject, '')
+    @request.session[:user_id] = 1
+
+    assert_no_difference('VersionedFileCf::FileRevision.count') do
+      post(:restore, params: { id: @previous_revision.id })
+    end
+
+    assert_redirected_to history_versioned_files_path(custom_value_id: @custom_value.id)
+    assert flash[:error].present?
+    assert @revision.reload.active?
+    assert_equal @revision.attachment_id.to_s, @custom_value.reload.value
+  ensure
+    @issue.update_column(:subject, 'Cannot print recipes')
+  end
 end

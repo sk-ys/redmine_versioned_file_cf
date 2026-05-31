@@ -6,7 +6,11 @@ ja:
     error_no_valid_revisions_selected_for_removal: 削除対象のリビジョンが見つかりません。
     error_revision_cannot_be_deleted: このリビジョンを削除する権限がありません。
     error_failed_to_remove_revision: リビジョンの削除に失敗しました。
+    error_failed_to_restore_revision: リビジョンの復元に失敗しました。
+    error_issue_cannot_be_updated_for_restore: このリビジョンを復元するためにチケットを更新できません。
     notice_revision_removed: リビジョンを削除しました。
+    notice_revision_restored: リビジョン r%{revision} として復元しました。
+    journal_restore_revision: リビジョン r%{revision} を復元しました。
     label_compare_attachments_when_uploading: アップロード時に添付ファイルを比較
     label_compare_attachments_by_hash: ハッシュ値で添付ファイルを比較
     description_compare_attachments_by_hash: ハッシュ値で比較しない場合、ファイルの内容を直接比較します（速度が遅くなる可能性があります）。
@@ -19,6 +23,7 @@ ja:
       confirm_convert_to_file: ファイル（リビジョン管理）形式からファイル形式に変換します。すべての履歴は削除されます。続行しますか？
       revert_warning: ファイル（リビジョン管理）形式からファイル形式に変換すると、すべての履歴が削除されます。
       remaining_invalid_values: "  ...ほか %{count} 件"
+      restore: 復元
     tasks:
       common:
         label_start: "カスタムフィールド id=%{id}（%{name}）を確認しています... 全=%{total} 件中、添付あり=%{filled} 件"

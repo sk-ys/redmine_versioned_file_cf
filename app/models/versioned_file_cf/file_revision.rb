@@ -71,6 +71,8 @@ module VersionedFileCf
     end
 
     def destroy_attachment
+      return if self.class.where(attachment_id: attachment_id).where.not(id: id).exists?
+
       attachment&.destroy
     end
   end
