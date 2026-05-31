@@ -91,4 +91,41 @@ class VersionedFilesControllerTest < Redmine::ControllerTest
     assert_response :forbidden
     assert_not_equal 'should fail', @revision.attachment.reload.description
   end
+
+  def test_destroy_removes_inactive_revision_for_authorized_user
+    @request.session[:user_id] = 1
+
+    assert_difference('VersionedFileCf::FileRevision.count', -1) do
+      assert_difference('Attachment.count', -1) do
+        delete(:destroy, params: { id: @previous_revision.id })
+      end
+    end
+
+    assert_redirected_to history_versioned_files_path(custom_value_id: @custom_value.id)
+    assert_equal I18n.t(:notice_revision_removed, scope: :versioned_file_cf), flash[:notice]
+    assert_not VersionedFileCf::FileRevision.exists?(@previous_revision.id)
+  end
+
+  def test_destroy_rejects_active_revision
+    @request.session[:user_id] = 1
+
+    assert_no_difference('VersionedFileCf::FileRevision.count') do
+      delete(:destroy, params: { id: @revision.id })
+    end
+
+    assert_redirected_to history_versioned_files_path(custom_value_id: @custom_value.id)
+    assert_equal I18n.t(:error_active_record_cannot_be_deleted, scope: :versioned_file_cf), flash[:error]
+    assert VersionedFileCf::FileRevision.exists?(@revision.id)
+  end
+
+  def test_destroy_denies_access_without_permission
+    @request.session[:user_id] = 2
+
+    assert_no_difference('VersionedFileCf::FileRevision.count') do
+      delete(:destroy, params: { id: @previous_revision.id })
+    end
+
+    assert_response :forbidden
+    assert VersionedFileCf::FileRevision.exists?(@previous_revision.id)
+  end
 end
