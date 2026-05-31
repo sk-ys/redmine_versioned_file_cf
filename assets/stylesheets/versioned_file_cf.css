@@ -53,5 +53,11 @@
     .blank {
       flex-grow: 1;
     }
+    
+    .filename {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 }
