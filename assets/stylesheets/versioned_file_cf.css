@@ -5,3 +5,9 @@
     margin-inline-start: 0;
   }
 }
+
+.versioned_file_cf {
+  .revision-file-history-link {
+    font-size: 0.9em;
+  }
+}

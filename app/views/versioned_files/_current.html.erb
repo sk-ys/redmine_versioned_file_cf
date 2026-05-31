@@ -8,6 +8,10 @@
         class: 'revision-file-meta' %>
     <% end %>
   </div>
-<% elsif value.present? %>
-  <div class="wiki"><%= simple_format h(value) %></div>
+<% else %>
+  <% if latest_revision.present? %>
+    <%= link_to "(#{l(:label_history)})",\
+      history_versioned_files_path(custom_value_id: latest_revision.custom_value_id),\
+      class: 'revision-file-history-link' %>
+  <% end %>
 <% end %>
