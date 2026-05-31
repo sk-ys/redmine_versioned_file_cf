@@ -14,6 +14,7 @@ module VersionedFileCf
 
     delegate :custom_field, :customized, to: :custom_value
 
+    before_destroy :ensure_not_active
     after_destroy :destroy_attachment
 
     def issue
@@ -61,6 +62,13 @@ module VersionedFileCf
     end
 
     private
+
+    def ensure_not_active
+      return true unless active?
+
+      errors.add(:base, l(:error_active_record_cannot_be_deleted, scope: :versioned_file_cf))
+      throw(:abort)
+    end
 
     def destroy_attachment
       attachment&.destroy
