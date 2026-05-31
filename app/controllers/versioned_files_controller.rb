@@ -197,6 +197,10 @@ class VersionedFilesController < ApplicationController
     elsif @custom_value.customized.is_a?(Project)
       @project = @custom_value.customized
       deny_access unless @project.visible?(User.current)
+    elsif @custom_value.customized.is_a?(Version)
+      version = @custom_value.customized
+      @project = version.project
+      deny_access unless version.visible?(User.current)
     else
       render_404
     end
