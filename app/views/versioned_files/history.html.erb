@@ -77,11 +77,11 @@
               <% end %>
               <% if User.current.allowed_to?(:restore_file_revision, @project) && !revision.active? %>
                 <%= link_to\
-                  sprite_icon('cancel', l(:button_restore)),\
+                  sprite_icon('cancel', l('versioned_file_cf.ui.restore')),\
                   restore_versioned_file_path(revision.id),\
                   method: :post,\
                   data: { confirm: l(:text_are_you_sure) },\
-                  title: l(:button_restore),\
+                  title: l('versioned_file_cf.ui.restore'),\
                   class: 'icon icon-cancel icon-only' %>
               <% end %>
               <%= link_to\

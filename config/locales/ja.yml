@@ -23,6 +23,7 @@ ja:
       confirm_convert_to_file: ファイル（リビジョン管理）形式からファイル形式に変換します。すべての履歴は削除されます。続行しますか？
       revert_warning: ファイル（リビジョン管理）形式からファイル形式に変換すると、すべての履歴が削除されます。
       remaining_invalid_values: "  ...ほか %{count} 件"
+      restore: 復元
     tasks:
       common:
         label_start: "カスタムフィールド id=%{id}（%{name}）を確認しています... 全=%{total} 件中、添付あり=%{filled} 件"

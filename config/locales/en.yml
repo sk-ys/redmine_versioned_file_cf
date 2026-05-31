@@ -23,6 +23,7 @@ en:
       confirm_convert_to_file: Convert this Versioned file format to File format? All revision history will be deleted.
       revert_warning: Converting from Versioned file format to File format deletes all revision history.
       remaining_invalid_values: "  ...and %{count} more"
+      restore: Restore
     tasks:
       common:
         label_start: "Checking custom field id=%{id} (%{name})... total values=%{total}, values with attachments=%{filled}"
