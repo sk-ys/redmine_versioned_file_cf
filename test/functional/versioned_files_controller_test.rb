@@ -131,6 +131,7 @@ class VersionedFilesControllerTest < Redmine::ControllerTest
 
   def test_restore_creates_new_revision_for_authorized_user
     @request.session[:user_id] = 1
+    old_attachment_id = @custom_value.value
 
     assert_difference('VersionedFileCf::FileRevision.count', 1) do
       assert_difference('Journal.count', 1) do
@@ -145,6 +146,12 @@ class VersionedFilesControllerTest < Redmine::ControllerTest
     assert restored_revision.active?
     assert_not @revision.reload.active?
     assert_equal @previous_revision.attachment_id.to_s, @custom_value.reload.value
+    journal = @issue.journals.order(id: :desc).first
+    detail = journal.details.find_by(property: 'cf', prop_key: @custom_field.id.to_s)
+    assert_not_nil detail
+    assert_equal old_attachment_id, detail.old_value
+    assert_equal @previous_revision.attachment_id.to_s, detail.value
+    assert journal.notes.blank?
     assert_redirected_to history_versioned_files_path(custom_value_id: @custom_value.id)
     assert_equal I18n.t(:notice_revision_restored, scope: :versioned_file_cf, revision: restored_revision.revision_number), flash[:notice]
   end

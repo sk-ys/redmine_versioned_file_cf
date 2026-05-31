@@ -112,7 +112,13 @@ class VersionedFilesController < ApplicationController
           raise ActiveRecord::Rollback
         end
 
-        issue.init_journal(User.current, l(:journal_restore_revision, scope: :versioned_file_cf, revision: @revision.revision_number))
+        issue.init_journal(User.current)
+        issue.current_journal.__send__(
+          :add_custom_field_detail,
+          custom_value.custom_field_id,
+          custom_value.value,
+          @revision.attachment_id.to_s
+        )
         unless issue.save
           @restore_error_message = issue.errors.full_messages.to_sentence.presence ||
                                    l(:error_issue_cannot_be_updated_for_restore, scope: :versioned_file_cf)
