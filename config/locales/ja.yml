@@ -2,6 +2,11 @@ ja:
   label_versioned_file: ファイル（リビジョン管理）
   versioned_file_cf:
     error_versioned_file_unchanged: 内容が同一です。
+    error_active_record_cannot_be_deleted: アクティブなレコードは削除できません
+    error_no_valid_revisions_selected_for_removal: 削除対象のリビジョンが見つかりません。
+    error_revision_cannot_be_deleted: このリビジョンを削除する権限がありません。
+    error_failed_to_remove_revision: リビジョンの削除に失敗しました。
+    notice_revision_removed: リビジョンを削除しました。
     label_compare_attachments_when_uploading: アップロード時に添付ファイルを比較
     label_compare_attachments_by_hash: ハッシュ値で添付ファイルを比較
     description_compare_attachments_by_hash: ハッシュ値で比較しない場合、ファイルの内容を直接比較します（速度が遅くなる可能性があります）。

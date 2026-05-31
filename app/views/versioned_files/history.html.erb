@@ -1,30 +1,42 @@
 <% content_for :header_tags do %>
   <style>
-    .wiki-page-versions .description {
-      div {
-        display: flex;
-        gap: 5px;
-        
-        input {
-          flex: 1 0 auto;
-          border-width: 0;
-          &:active, &:focus {
-            outline: none;
-            border-width: 1px;
-            
-            &+button {
-              display: inline-block;
+    .wiki-page-versions {
+      .description {
+        div {
+          display: flex;
+          gap: 5px;
+          
+          input {
+            flex: 1 0 auto;
+            border-width: 0;
+            &:active, &:focus {
+              outline: none;
+              border-width: 1px;
+              
+              &+button {
+                display: inline-block;
+              }
             }
           }
+          button {
+            flex: 0 0 auto;
+            cursor: pointer;
+            display: none;
+            
+            &:active, &:focus, &:hover {
+                display: inline-block;
+              }
+          }
         }
-        button {
-          flex: 0 0 auto;
-          cursor: pointer;
-          display: none;
-          
-          &:active, &:focus, &:hover {
-              display: inline-block;
-            }
+      }
+      .filename-with-actions {
+        display: inline-flex;
+        align-items: center;
+        width: 90%;
+        gap: 5px;
+        
+        .blank {
+          flex-grow: 1;
         }
       }
     }
@@ -92,12 +104,24 @@
           <td class="updated_on"><%= format_time(revision.created_at) %></td>
           <td class="author"><%= link_to_user revision.author %></td>
           <td class="filename">
-            <%= link_to_attachment revision.attachment %>
-            <%= link_to\
-              sprite_icon('download', l(:button_download)),\
-              download_named_attachment_path(revision.attachment, revision.attachment.filename),\
-              title: l(:button_download),\
-              class: 'icon icon-download icon-only' %>
+            <span class="filename-with-actions">
+              <%= link_to_attachment revision.attachment, class: "filename" %>
+              <span class="blank"></span>
+              <% if User.current.allowed_to?(:remove_file_revision, @project) && !revision.active? %>
+                <%= link_to\
+                  sprite_icon('del', l(:button_delete)),\
+                  versioned_file_path(revision.id),\
+                  method: :delete,\
+                  data: { confirm: l(:text_are_you_sure) },\
+                  title: l(:button_delete),\
+                  class: 'icon icon-del icon-only' %>
+              <% end %>
+              <%= link_to\
+                sprite_icon('download', l(:button_download)),\
+                download_named_attachment_path(revision.attachment, revision.attachment.filename),\
+                title: l(:button_download),\
+                class: 'icon icon-download icon-only' %>
+            </span>
           </td>
           <td class="is_text">
             <%= checked_image  revision.attachment.readable? && revision.attachment.is_text? %>

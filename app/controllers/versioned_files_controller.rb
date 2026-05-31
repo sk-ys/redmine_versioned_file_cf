@@ -8,7 +8,7 @@ class VersionedFilesController < ApplicationController
   DIFF_TYPES = %w[inline sbs].freeze
   GIT_NO_INDEX_ARGS = %w[diff --no-index --no-color --text --].freeze
 
-  before_action :find_revision, only: [:diff, :update_description]
+  before_action :find_revision, only: [:diff, :update_description, :destroy]
   before_action :find_custom_value, only: [:history, :compare]
   before_action :authorize
 
@@ -64,10 +64,43 @@ class VersionedFilesController < ApplicationController
     end
   end
 
+  def destroy
+    assign_contexts_from_revision
+    if @revision.nil?
+      respond_remove_revision_failure(
+        l(:error_no_valid_revisions_selected_for_removal, scope: :versioned_file_cf)
+      )
+      return
+    end
+
+    unless @revision.visible?(User.current) && @revision.attachments_deletable?(User.current)
+      respond_remove_revision_failure(
+        l(:error_revision_cannot_be_deleted, scope: :versioned_file_cf),
+        status: :forbidden
+      )
+      return
+    end
+
+    if @revision.active?
+      respond_remove_revision_failure(
+        l(:error_active_record_cannot_be_deleted, scope: :versioned_file_cf)
+      )
+      return
+    end
+
+    if @revision.destroy
+      respond_remove_revision_success(l(:notice_revision_removed, scope: :versioned_file_cf))
+    else
+      message = @revision.errors.full_messages.to_sentence.presence ||
+                l(:error_failed_to_remove_revision, scope: :versioned_file_cf)
+      respond_remove_revision_failure(message)
+    end
+  end
+
   private
 
   def prepare_diff
-    assign_diff_context
+    assign_contexts_from_revision
     return deny_access unless @revision.visible?(User.current)
 
     @diff_type = resolve_diff_type
@@ -78,7 +111,7 @@ class VersionedFilesController < ApplicationController
     @diff_download_path = git_available? ? build_diff_download_path : nil
   end
 
-  def assign_diff_context
+  def assign_contexts_from_revision
     @attachment = @revision.attachment
     @custom_value = @revision.custom_value
     @custom_field = @custom_value.custom_field
@@ -127,6 +160,26 @@ class VersionedFilesController < ApplicationController
     return false unless revision.attachments_editable?(User.current)
 
     User.current.allowed_to?(:update_versioned_file_description, @project)
+  end
+
+  def respond_remove_revision_success(message)
+    respond_to do |format|
+      format.json { render json: { success: true, message: message } }
+      format.html do
+        flash[:notice] = message
+        redirect_back_or_default history_versioned_files_path(custom_value_id: @custom_value.id)
+      end
+    end
+  end
+
+  def respond_remove_revision_failure(message, status: :unprocessable_entity)
+    respond_to do |format|
+      format.json { render json: { success: false, message: message }, status: status }
+      format.html do
+        flash[:error] = message
+        redirect_back_or_default history_versioned_files_path(custom_value_id: @custom_value.id)
+      end
+    end
   end
 
   def text_to_lines(text)
