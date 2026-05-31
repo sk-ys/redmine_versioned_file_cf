@@ -11,3 +11,62 @@
     font-size: 0.9em;
   }
 }
+
+.wiki-page-versions {
+  .description {
+    div {
+      display: flex;
+      gap: 5px;
+
+      input {
+        flex: 1 0 auto;
+        border-width: 0;
+        background: transparent;
+        padding: 0;
+        &:active,
+        &:focus {
+          outline: none;
+          border-width: 1px;
+          background: #fff;
+
+          & + button {
+            opacity: 0.5;
+            visibility: visible;
+          }
+        }
+      }
+      button {
+        flex: 0 0 auto;
+        cursor: pointer;
+        visibility: hidden;
+
+        &:active,
+        &:focus,
+        &:hover {
+          opacity: 1 !important;
+          visibility: visible;
+        }
+      }
+    }
+  }
+  .filename-with-actions {
+    display: inline-flex;
+    align-items: center;
+    width: 90%;
+    gap: 5px;
+
+    .blank {
+      flex-grow: 1;
+    }
+
+    .filename {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media screen and (max-width: 899px) {
+      width: 100%;
+    }
+  }
+}
