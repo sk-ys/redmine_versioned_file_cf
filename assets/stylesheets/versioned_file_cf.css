@@ -30,19 +30,21 @@
           background: #fff;
 
           & + button {
-            display: inline-block;
+            opacity: 0.5;
+            visibility: visible;
           }
         }
       }
       button {
         flex: 0 0 auto;
         cursor: pointer;
-        display: none;
+        visibility: hidden;
 
         &:active,
         &:focus,
         &:hover {
-          display: inline-block;
+          opacity: 1 !important;
+          visibility: visible;
         }
       }
     }
