@@ -21,10 +21,13 @@
       input {
         flex: 1 0 auto;
         border-width: 0;
+        background: transparent;
+        padding: 0;
         &:active,
         &:focus {
           outline: none;
           border-width: 1px;
+          background: #fff;
 
           & + button {
             display: inline-block;
