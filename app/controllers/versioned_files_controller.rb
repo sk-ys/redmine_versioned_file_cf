@@ -194,6 +194,11 @@ class VersionedFilesController < ApplicationController
       @issue = @custom_value.customized
       @project = @issue.project if @issue.respond_to?(:project)
       deny_access unless @issue.visible?(User.current)
+    elsif @custom_value.customized.is_a?(Project)
+      @project = @custom_value.customized
+      deny_access unless @project.visible?(User.current)
+    else
+      render_404
     end
   rescue ActiveRecord::RecordNotFound
     render_404
