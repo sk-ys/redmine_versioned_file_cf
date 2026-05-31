@@ -66,15 +66,11 @@
             <span class="filename-with-actions">
               <%= link_to_attachment revision.attachment, class: "filename" %>
               <span class="blank"></span>
-              <% if User.current.allowed_to?(:remove_file_revision, @project) && !revision.active? %>
-                <%= link_to\
-                  sprite_icon('del', l(:button_delete)),\
-                  versioned_file_path(revision.id),\
-                  method: :delete,\
-                  data: { confirm: l(:text_are_you_sure) },\
-                  title: l(:button_delete),\
-                  class: 'icon icon-del icon-only' %>
-              <% end %>
+              <%= link_to\
+                sprite_icon('download', l(:button_download)),\
+                download_named_attachment_path(revision.attachment, revision.attachment.filename),\
+                title: l(:button_download),\
+                class: 'icon icon-download icon-only' %>
               <% if User.current.allowed_to?(:restore_file_revision, @project) && !revision.active? %>
                 <%= link_to\
                   sprite_icon('cancel', l('versioned_file_cf.ui.restore')),\
@@ -84,11 +80,15 @@
                   title: l('versioned_file_cf.ui.restore'),\
                   class: 'icon icon-cancel icon-only' %>
               <% end %>
-              <%= link_to\
-                sprite_icon('download', l(:button_download)),\
-                download_named_attachment_path(revision.attachment, revision.attachment.filename),\
-                title: l(:button_download),\
-                class: 'icon icon-download icon-only' %>
+              <% if User.current.allowed_to?(:remove_file_revision, @project) && !revision.active? %>
+                <%= link_to\
+                  sprite_icon('del', l(:button_delete)),\
+                  versioned_file_path(revision.id),\
+                  method: :delete,\
+                  data: { confirm: l(:text_are_you_sure) },\
+                  title: l(:button_delete),\
+                  class: 'icon icon-del icon-only' %>
+              <% end %>
             </span>
           </td>
           <td class="is_text">
