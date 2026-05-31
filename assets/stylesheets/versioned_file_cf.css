@@ -11,3 +11,47 @@
     font-size: 0.9em;
   }
 }
+
+.wiki-page-versions {
+  .description {
+    div {
+      display: flex;
+      gap: 5px;
+
+      input {
+        flex: 1 0 auto;
+        border-width: 0;
+        &:active,
+        &:focus {
+          outline: none;
+          border-width: 1px;
+
+          & + button {
+            display: inline-block;
+          }
+        }
+      }
+      button {
+        flex: 0 0 auto;
+        cursor: pointer;
+        display: none;
+
+        &:active,
+        &:focus,
+        &:hover {
+          display: inline-block;
+        }
+      }
+    }
+  }
+  .filename-with-actions {
+    display: inline-flex;
+    align-items: center;
+    width: 90%;
+    gap: 5px;
+
+    .blank {
+      flex-grow: 1;
+    }
+  }
+}
