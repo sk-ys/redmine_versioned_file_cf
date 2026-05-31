@@ -52,7 +52,7 @@
   .filename-with-actions {
     display: inline-flex;
     align-items: center;
-    width: 90%;
+    width: 100%;
     gap: 5px;
 
     .blank {
@@ -63,10 +63,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-
-    @media screen and (max-width: 899px) {
-      width: 100%;
     }
   }
 }
