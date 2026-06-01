@@ -8,6 +8,7 @@ module VersionedFileCf
     self.change_as_diff = false
     self.change_no_details = true
     self.bulk_edit_supported = false
+    self.customized_class_names = %w(Issue Project TimeEntry Version Document User Group)
     field_attributes :extensions_allowed
 
     def formatted_custom_value(view, custom_value, html = false)
