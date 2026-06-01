@@ -201,6 +201,10 @@ class VersionedFilesController < ApplicationController
       version = @custom_value.customized
       @project = version.project
       deny_access unless version.visible?(User.current)
+    elsif @custom_value.customized.is_a?(Document)
+      document = @custom_value.customized
+      @project = document.project
+      deny_access unless document.visible?(User.current)
     else
       render_404
     end
