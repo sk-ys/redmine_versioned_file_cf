@@ -190,34 +190,11 @@ class VersionedFilesController < ApplicationController
   def find_custom_value
     @custom_value = CustomValue.includes(:custom_field, :customized).find(params[:custom_value_id])
     @custom_field = @custom_value.custom_field
-    if @custom_value.customized.is_a?(Issue)
-      @issue = @custom_value.customized
-      @project = @issue.project
-      deny_access unless @issue.visible?(User.current)
-    elsif @custom_value.customized.is_a?(TimeEntry)
-      time_entry = @custom_value.customized
-      @project = time_entry.project
-      deny_access unless time_entry.visible?(User.current)
-    elsif @custom_value.customized.is_a?(Project)
-      @project = @custom_value.customized
-      deny_access unless @project.visible?(User.current)
-    elsif @custom_value.customized.is_a?(Version)
-      version = @custom_value.customized
-      @project = version.project
-      deny_access unless version.visible?(User.current)
-    elsif @custom_value.customized.is_a?(Document)
-      document = @custom_value.customized
-      @project = document.project
-      deny_access unless document.visible?(User.current)
-    elsif @custom_value.customized.is_a?(User)
-      user = @custom_value.customized
-      deny_access unless user.visible?(User.current)
-    elsif @custom_value.customized.is_a?(Group)
-      group = @custom_value.customized
-      deny_access unless group.visible?(User.current)
-    else
-      render_404
-    end
+    customized = @custom_value.customized
+    @issue = customized if customized.is_a?(Issue)
+    @project = project_for_customized(customized)
+
+    deny_access unless visible_customized?(customized)
   rescue ActiveRecord::RecordNotFound
     render_404
   end
@@ -436,12 +413,30 @@ class VersionedFilesController < ApplicationController
   def diff_download_request?
     request.path_parameters[:format].to_s == 'diff' || params[:format].to_s == 'diff'
   end
-end
 
-def authorize_versioned_file_access
-  if @project
-    authorize
-  else
-    authorize_global
+  def authorize_versioned_file_access
+    if @project
+      authorize
+    else
+      authorize_global
+    end
+  end
+
+  def project_for_customized(customized)
+    case customized
+    when Issue, TimeEntry, Version, Document
+      customized.project
+    when Project
+      customized
+    end
+  end
+
+  def visible_customized?(customized)
+    case customized
+    when Issue, TimeEntry, Project, Version, Document, User, Group
+      customized.visible?(User.current)
+    else
+      false
+    end
   end
 end
