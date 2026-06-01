@@ -14,6 +14,7 @@ class VersionedFilesController < ApplicationController
 
   helper :issues
   helper :attachments
+  helper :versioned_file
 
   def history
     @version_count = revisions_scope.count
