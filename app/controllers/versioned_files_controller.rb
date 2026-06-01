@@ -10,7 +10,7 @@ class VersionedFilesController < ApplicationController
 
   before_action :find_revision, only: [:diff, :update_description, :destroy, :restore]
   before_action :find_custom_value, only: [:history, :compare]
-  before_action :authorize
+  before_action :authorize_versioned_file_access
 
   helper :issues
   helper :attachments
@@ -205,6 +205,9 @@ class VersionedFilesController < ApplicationController
       document = @custom_value.customized
       @project = document.project
       deny_access unless document.visible?(User.current)
+    elsif @custom_value.customized.is_a?(User)
+      user = @custom_value.customized
+      deny_access unless user.visible?(User.current)
     else
       render_404
     end
@@ -425,5 +428,13 @@ class VersionedFilesController < ApplicationController
 
   def diff_download_request?
     request.path_parameters[:format].to_s == 'diff' || params[:format].to_s == 'diff'
+  end
+end
+
+def authorize_versioned_file_access
+  if @project
+    authorize
+  else
+    authorize_global
   end
 end
