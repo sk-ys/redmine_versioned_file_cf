@@ -208,6 +208,9 @@ class VersionedFilesController < ApplicationController
     elsif @custom_value.customized.is_a?(User)
       user = @custom_value.customized
       deny_access unless user.visible?(User.current)
+    elsif @custom_value.customized.is_a?(Group)
+      group = @custom_value.customized
+      deny_access unless group.visible?(User.current)
     else
       render_404
     end
