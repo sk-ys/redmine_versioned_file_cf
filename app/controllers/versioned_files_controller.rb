@@ -192,7 +192,7 @@ class VersionedFilesController < ApplicationController
     @custom_field = @custom_value.custom_field
     if @custom_value.customized.is_a?(Issue)
       @issue = @custom_value.customized
-      @project = @issue.project if @issue.respond_to?(:project)
+      @project = @issue.project
       deny_access unless @issue.visible?(User.current)
     elsif @custom_value.customized.is_a?(TimeEntry)
       time_entry = @custom_value.customized
