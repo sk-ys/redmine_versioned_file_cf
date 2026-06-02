@@ -25,14 +25,16 @@
   </script>
 <% end %>
 
+<% object_title = title_from_customized(@custom_value.customized) %>
+
 <h2>
   <%= safe_join([
-    link_to_record(@custom_value.customized),
+    link_to_record(@custom_value.customized) || object_title,
     @custom_field.name + ' - ' + l(:label_history)
   ], ' » ') %>
 </h2>
 
-<% html_title "#{@custom_value.customized} » #{@custom_field.name} - #{l(:label_history)}" %>
+<% html_title "#{object_title} » #{@custom_field.name} - #{l(:label_history)}" %>
 
 <%= form_tag(compare_versioned_files_path, method: :get) do %>
   <% show_diff = @revisions.size > 1 %>

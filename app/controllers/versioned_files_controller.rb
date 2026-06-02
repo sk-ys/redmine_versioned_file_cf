@@ -10,10 +10,11 @@ class VersionedFilesController < ApplicationController
 
   before_action :find_revision, only: [:diff, :update_description, :destroy, :restore]
   before_action :find_custom_value, only: [:history, :compare]
-  before_action :authorize
+  before_action :authorize_versioned_file_access
 
   helper :issues
   helper :attachments
+  helper :versioned_file
 
   def history
     @version_count = revisions_scope.count
@@ -190,11 +191,11 @@ class VersionedFilesController < ApplicationController
   def find_custom_value
     @custom_value = CustomValue.includes(:custom_field, :customized).find(params[:custom_value_id])
     @custom_field = @custom_value.custom_field
-    if @custom_value.customized.is_a?(Issue)
-      @issue = @custom_value.customized
-      @project = @issue.project if @issue.respond_to?(:project)
-      deny_access unless @issue.visible?(User.current)
-    end
+    customized = @custom_value.customized
+    @issue = customized if customized.is_a?(Issue)
+    @project = project_for_customized(customized)
+
+    deny_access unless visible_customized?(customized)
   rescue ActiveRecord::RecordNotFound
     render_404
   end
@@ -412,5 +413,31 @@ class VersionedFilesController < ApplicationController
 
   def diff_download_request?
     request.path_parameters[:format].to_s == 'diff' || params[:format].to_s == 'diff'
+  end
+
+  def authorize_versioned_file_access
+    if @project
+      authorize
+    else
+      authorize_global
+    end
+  end
+
+  def project_for_customized(customized)
+    case customized
+    when Issue, TimeEntry, Version, Document
+      customized.project
+    when Project
+      customized
+    end
+  end
+
+  def visible_customized?(customized)
+    case customized
+    when Issue, TimeEntry, Project, Version, Document, User, Group
+      customized.visible?(User.current)
+    else
+      false
+    end
   end
 end
