@@ -1,15 +1,21 @@
 # Redmine Versioned File CF Plugin
 
-This plugin adds a new custom field format named `File (revision-managed)` to Redmine, allowing uploaded text files to be managed with revision history.
+This plugin adds a new custom field format named `File (revision-managed)` to Redmine, allowing uploaded files to be managed with revision history.
 
 Japanese version: [README.ja.md](README.ja.md)
 
 ## Features
 
-- Adds `File (revision-managed)` as a custom field format
+- Supports inserting the `File (revision-managed)` custom field for the following objects:
+   - `Issue`, `Project`, `TimeEntry`, `Version`, `Document`, `User`, `Group`
 - Supports file uploads in the same way as the existing file custom field
-- Shows the history of uploaded files
-- Shows diffs between revisions
+- Supports showing, deleting, restoring, and diffing file revision history
+- Supports adding and editing description for files
+- Supports the following permissions:
+   - View revisions
+   - Edit file description
+   - Delete revision
+   - Restore revision
 - Lets you switch between `File` and `File (revision-managed)` using dedicated conversion buttons in the UI ([details](#ui-conversion-en))
 - Provides rake tasks for orphan attachment cleanup and custom field format conversion ([details](#maintenance-en))
 
