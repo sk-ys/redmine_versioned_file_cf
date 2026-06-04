@@ -12,6 +12,8 @@ module VersionedFileCf
     field_attributes :extensions_allowed
 
     def formatted_custom_value(view, custom_value, html = false)
+      append_header_stylesheet_once(view)
+
       persisted_custom_value = custom_value.customized.custom_value_for(custom_value.custom_field)
       revision = current_revision_for(persisted_custom_value)
       latest_revision = latest_revision_for(persisted_custom_value)
