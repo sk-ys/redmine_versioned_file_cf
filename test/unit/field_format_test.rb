@@ -90,4 +90,51 @@ class VersionedFileCfFieldFormatTest < ActiveSupport::TestCase
   ensure
     binary_file.close!
   end
+
+  def test_formatted_custom_value_returns_revision_with_number_for_csv_export
+    @custom_value.value = @format.set_custom_field_value(
+      @custom_field,
+      @custom_value,
+      { file: uploaded_test_file('example.py', 'text/plain') }
+    )
+
+    revision = new_record(VersionedFileCf::FileRevision) do
+      @format.after_save_custom_value(@custom_field, @custom_value)
+    end
+
+    persisted_custom_value = @issue.custom_value_for(@custom_field)
+    result = @format.formatted_custom_value(nil, persisted_custom_value, html: false)
+
+    assert_equal 'example.py(r1)', result
+  end
+
+  def test_formatted_custom_value_returns_display_value_for_csv_without_revision
+    persisted_custom_value = @issue.custom_value_for(@custom_field)
+    result = @format.formatted_custom_value(nil, persisted_custom_value, html: false)
+
+    assert_equal '', result
+  end
+
+  def test_formatted_custom_value_includes_revision_number_on_multiple_revisions
+    @custom_value.value = @format.set_custom_field_value(
+      @custom_field,
+      @custom_value,
+      { file: uploaded_test_file('example.py', 'text/plain') }
+    )
+    @format.after_save_custom_value(@custom_field, @custom_value)
+
+    @custom_value.value = @format.set_custom_field_value(
+      @custom_field,
+      @custom_value,
+      { file: uploaded_test_file('example.py', 'text/plain') }
+    )
+    new_record(VersionedFileCf::FileRevision) do
+      @format.after_save_custom_value(@custom_field, @custom_value)
+    end
+
+    persisted_custom_value = @issue.custom_value_for(@custom_field)
+    result = @format.formatted_custom_value(nil, persisted_custom_value, html: false)
+
+    assert_equal 'example.py(r2)', result
+  end
 end
