@@ -116,6 +116,7 @@ module VersionedFileCf
 
     def append_header_stylesheet_once(view)
       return if view.instance_variable_get(:@versioned_file_cf_header_stylesheet_appended)
+      return unless view.respond_to?(:content_for)
 
       view.instance_variable_set(:@versioned_file_cf_header_stylesheet_appended, true)
       view.content_for(:header_tags) do
