@@ -90,4 +90,67 @@ class VersionedFileCfFieldFormatTest < ActiveSupport::TestCase
   ensure
     binary_file.close!
   end
+
+  def test_formatted_custom_value_returns_revision_with_number_for_csv_export
+    @custom_value.value = @format.set_custom_field_value(
+      @custom_field,
+      @custom_value,
+      { file: uploaded_test_file('testfile.txt', 'text/plain') }
+    )
+
+    revision = new_record(VersionedFileCf::FileRevision) do
+      @format.after_save_custom_value(@custom_field, @custom_value)
+    end
+
+    persisted_custom_value = @issue.custom_value_for(@custom_field)
+    persisted_custom_value.value = revision.attachment.id.to_s
+    persisted_custom_value.save!
+    
+    result = @format.formatted_custom_value(nil, persisted_custom_value, false)
+
+    assert_equal 'testfile.txt(r1)', result
+  end
+
+  def test_formatted_custom_value_returns_display_value_for_csv_without_revision
+    persisted_custom_value = @issue.custom_value_for(@custom_field)
+    result = @format.formatted_custom_value(nil, persisted_custom_value, false)
+
+    assert_equal '', result
+  end
+
+  def test_formatted_custom_value_includes_revision_number_on_multiple_revisions
+    @custom_value.value = @format.set_custom_field_value(
+      @custom_field,
+      @custom_value,
+      { file: uploaded_test_file('testfile.txt', 'text/plain') }
+    )
+    @format.after_save_custom_value(@custom_field, @custom_value)
+
+    first_custom_value = @issue.custom_value_for(@custom_field)
+    first_custom_value.reload
+    
+    # Uploading a second file with different content to create a new revision
+    file_with_different_content = Tempfile.new(['testfile2', '.txt'])
+    file_with_different_content.write('different content')
+    file_with_different_content.rewind
+    file_with_different_content.define_singleton_method(:original_filename) { 'testfile.txt' }
+    file_with_different_content.define_singleton_method(:content_type) { 'text/plain' }
+    
+    @custom_value.value = @format.set_custom_field_value(
+      @custom_field,
+      @custom_value,
+      { file: file_with_different_content }
+    )
+    new_record(VersionedFileCf::FileRevision) do
+      @format.after_save_custom_value(@custom_field, @custom_value)
+    end
+
+    persisted_custom_value = @issue.custom_value_for(@custom_field)
+    persisted_custom_value.reload
+    result = @format.formatted_custom_value(nil, persisted_custom_value, false)
+
+    assert_equal 'testfile.txt(r2)', result
+  ensure
+    file_with_different_content&.close!
+  end
 end

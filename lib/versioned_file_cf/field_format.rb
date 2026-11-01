@@ -19,7 +19,11 @@ module VersionedFileCf
       latest_revision = latest_revision_for(persisted_custom_value)
       attachment = revision&.attachment || attachment_from_value(custom_value.value)
       display_value = attachment&.filename.to_s.presence || revision&.filename.to_s.presence || custom_value.value.to_s
-      return display_value unless html
+      
+      unless html
+        return "#{display_value}(r#{revision.revision_number})" if revision
+        return display_value
+      end
 
       view.render(
         partial: 'versioned_files/current',
@@ -115,6 +119,7 @@ module VersionedFileCf
     private
 
     def append_header_stylesheet_once(view)
+      return if view.nil?
       return if view.instance_variable_get(:@versioned_file_cf_header_stylesheet_appended)
       return unless view.respond_to?(:content_for)
 
